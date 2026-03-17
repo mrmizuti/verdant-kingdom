@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Verdant Kingdom">
+<meta name="theme-color" content="#1a2e0d">
+<title>The Verdant Kingdom</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper:#f0e8d8;--paper2:#e0d0b8;--ink:#2a1e0c;--ink2:#4a3418;--ink3:#7a5a38;
+  --moss:#3d5e1a;--moss2:#5a8828;--moss3:#8aba48;
+  --water:#4a9ab8;--water2:#7ac8e0;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,20px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{height:100%;width:100%;overflow:hidden;background:#0d1a08;font-family:'Nunito',sans-serif}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;max-width:430px;margin:0 auto;background:#1a2e0d;overflow:hidden}
+
+/* SCREENS */
+.screen{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0}
+.screen.active{display:flex}
+
+/* ── TITLE ── */
+#screen-title{align-items:center;justify-content:center;background:#1a2e0d;padding:40px 32px;position:relative;overflow:hidden}
+#screen-title::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,#2d5018 0%,#0d1a08 70%)}
+.title-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center}
+.title-art{width:170px;height:170px;margin-bottom:16px}
+.title-kicker{font-family:'Spectral',serif;font-size:11px;letter-spacing:.2em;color:#6a9a48;text-transform:uppercase;margin-bottom:8px}
+.title-main{font-family:'Spectral',serif;font-size:34px;font-weight:600;color:#e8dcc8;line-height:1.1;text-align:center;margin-bottom:10px}
+.title-rule{width:60px;height:1px;background:#4a7828;margin:0 auto 14px}
+.title-sub{font-family:'Spectral',serif;font-style:italic;font-size:14px;color:#8aaa68;text-align:center;margin-bottom:44px;line-height:1.65}
+.btn-start{background:#3d5e1a;color:#d8ecc0;border:none;border-radius:99px;padding:16px 52px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;transition:transform .15s}
+.btn-start:active{transform:scale(.96)}
+
+/* ── HOME ── */
+#screen-home{position:relative;background:#0d1a08}
+.home-scene{position:absolute;inset:0;overflow:hidden}
+.home-scene svg{width:100%;height:100%}
+#motesContainer{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:2}
+.mote{position:absolute;border-radius:50%;background:#c8f07a;pointer-events:none;animation:mote-rise linear infinite}
+@keyframes mote-rise{0%{opacity:0;transform:translateY(0) scale(1)}20%{opacity:.6}80%{opacity:.3}100%{opacity:0;transform:translateY(-90px) scale(.3)}}
+.home-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;pointer-events:none;z-index:3}
+.companion-header{pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:calc(var(--safe-top) + 14px) 20px 12px;background:linear-gradient(180deg,rgba(5,12,2,.75) 0%,transparent 100%);width:100%}
+.comp-name-lbl{font-family:'Spectral',serif;font-size:20px;font-weight:600;color:#d8f0a8;letter-spacing:.06em;text-shadow:0 2px 8px rgba(0,0,0,.6)}
+.bars-row{display:flex;flex-direction:column;gap:5px;width:190px}
+.bar-item{display:flex;align-items:center;gap:7px}
+.bar-ico{font-size:13px;flex-shrink:0;width:16px;text-align:center;line-height:1}
+.bar-track{flex:1;height:7px;background:rgba(0,0,0,.4);border-radius:99px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+.bar-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
+.bar-health{background:linear-gradient(90deg,#c83030,#f05050)}
+.bar-energy{background:linear-gradient(90deg,#c8a020,#f0d040)}
+.water-row{display:flex;align-items:center;gap:5px;margin-top:2px}
+.water-num{font-family:'Nunito',sans-serif;font-size:13px;font-weight:900;color:#a0e0f8;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+.grove-home-wrap{flex:1;display:flex;align-items:flex-end;justify-content:center;padding-bottom:92px;pointer-events:all;cursor:pointer;animation:g-idle 4s ease-in-out infinite}
+@keyframes g-idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.grove-home-wrap.pop{animation:g-pop .5s ease forwards}
+@keyframes g-pop{0%{transform:translateY(0) scale(1)}30%{transform:translateY(-16px) scale(1.09)}65%{transform:translateY(2px) scale(.97)}85%{transform:translateY(-4px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
+.grove-speech{position:absolute;bottom:calc(82px + var(--safe-bottom) + 148px);left:50%;transform:translateX(-50%);background:rgba(238,228,210,.93);border:1.5px solid rgba(90,60,20,.18);border-radius:16px 16px 16px 4px;padding:10px 16px;max-width:230px;min-width:150px;pointer-events:none;box-shadow:0 2px 14px rgba(0,0,0,.22);z-index:4}
+.grove-speech-text{font-family:'Spectral',serif;font-style:italic;font-size:13px;color:#2a1e0c;line-height:1.55;text-align:center;transition:opacity .2s}
+.toast{position:absolute;top:54px;left:50%;transform:translateX(-50%) translateY(-8px);background:rgba(8,18,4,.88);color:#c8f07a;border-radius:99px;padding:6px 18px;font-size:11px;font-weight:800;letter-spacing:.06em;z-index:500;opacity:0;pointer-events:none;transition:all .25s;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── NAV BAR ── */
+.nav-bar{position:relative;z-index:100;display:flex;align-items:stretch;background:rgba(10,18,5,.97);border-top:1px solid rgba(80,130,40,.2);padding-bottom:var(--safe-bottom);flex-shrink:0}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 4px 8px;background:none;border:none;cursor:pointer;transition:all .18s}
+.nav-btn:active{transform:scale(.9)}
+.nav-ico{width:30px;height:30px}
+.nav-ico svg{width:30px;height:30px}
+.nav-lbl{font-size:9px;font-weight:900;color:#3a5a20;letter-spacing:.05em;text-transform:uppercase}
+.nav-btn.active .nav-lbl{color:#8aba48}
+
+/* ── EXPLORE ── */
+#screen-explore{background:#0d1a08;position:relative;overflow:hidden}
+.exp-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 25%,#1e3a0a 0%,#070f04 80%)}
+.exp-inner{position:relative;z-index:2;display:flex;flex-direction:column;height:100%;padding:calc(var(--safe-top)+12px) 14px 8px;gap:8px}
+.exp-header{display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.exp-title{font-family:'Spectral',serif;font-size:19px;font-weight:600;color:#d8ecc0;letter-spacing:.04em}
+.water-badge{display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.45);border:1px solid rgba(74,154,184,.35);border-radius:99px;padding:5px 12px}
+.water-badge-num{font-size:12px;font-weight:900;color:#a0e0f8}
+.game-table{flex:1;display:flex;flex-direction:column;gap:7px;min-height:0;overflow:hidden}
+.hand-lbl{font-size:10px;font-weight:800;color:#5a8840;text-transform:uppercase;letter-spacing:.06em;flex-shrink:0}
+.hand-area{display:flex;flex-wrap:nowrap;gap:5px;overflow-x:auto;padding:4px 2px;flex-shrink:0;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.hand-area::-webkit-scrollbar{display:none}
+.card{flex-shrink:0;width:50px;height:75px;border-radius:7px;border:1.5px solid rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .14s;position:relative;font-family:'Nunito',sans-serif;font-weight:900}
+.card:active{transform:translateY(-8px) scale(1.05)}
+.card.back{background:linear-gradient(135deg,#1e3a10 0%,#0d1f06 100%);cursor:default}
+.card.back::after{content:'';position:absolute;inset:4px;border-radius:4px;border:1px solid rgba(80,140,40,.25);background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(60,100,30,.12) 4px,rgba(60,100,30,.12) 5px)}
+.card.red{background:#fff8f0;color:#b82020}
+.card.black{background:#fff8f0;color:#1a1a2e}
+.card-rank{font-size:15px;line-height:1}
+.card-suit{font-size:17px;line-height:1}
+.books-area{display:flex;flex-wrap:wrap;gap:5px;min-height:28px;flex-shrink:0}
+.book-chip{background:rgba(138,186,72,.18);border:1px solid rgba(138,186,72,.35);border-radius:6px;padding:4px 9px;font-size:11px;font-weight:800;color:#a8d870}
+.game-log{background:rgba(0,0,0,.32);border:1px solid rgba(80,130,40,.2);border-radius:10px;padding:8px 12px;font-family:'Spectral',serif;font-style:italic;font-size:13px;color:#8aaa68;line-height:1.55;min-height:46px;flex-shrink:0}
+.ask-row{display:flex;flex-wrap:wrap;gap:5px;flex-shrink:0;min-height:36px}
+.ask-btn{background:rgba(50,80,18,.65);border:1px solid rgba(138,186,72,.3);border-radius:8px;padding:7px 12px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:#c8e890;cursor:pointer;transition:all .14s}
+.ask-btn:active{background:rgba(80,120,28,.8);transform:scale(.96)}
+.gameover-wrap{position:absolute;inset:0;z-index:50;background:rgba(6,14,3,.9);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:40px}
+.gameover-wrap.show{display:flex}
+.go-icon{font-size:52px}
+.go-title{font-family:'Spectral',serif;font-size:26px;font-weight:600;color:#d8ecc0;text-align:center}
+.go-msg{font-family:'Spectral',serif;font-style:italic;font-size:13px;color:#7a9a58;text-align:center;line-height:1.65}
+.go-reward{display:flex;align-items:center;gap:8px;background:rgba(74,154,184,.14);border:1px solid rgba(74,154,184,.38);border-radius:12px;padding:10px 20px;font-size:15px;font-weight:900;color:#a0e0f8}
+.btn-again{margin-top:8px;background:#3d5e1a;color:#d8ecc0;border:none;border-radius:99px;padding:14px 40px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;cursor:pointer;letter-spacing:.06em;text-transform:uppercase}
+.btn-again:active{transform:scale(.96)}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- TITLE -->
+<div class="screen active" id="screen-title">
+  <div class="title-content">
+    <svg class="title-art" viewBox="0 0 200 200" fill="none">
+      <circle cx="100" cy="100" r="90" fill="#1e3a10"/>
+      <circle cx="100" cy="100" r="90" fill="none" stroke="#3a6020" stroke-width="1" stroke-dasharray="5 7"/>
+      <ellipse cx="100" cy="168" rx="54" ry="13" fill="#2a5010"/>
+      <rect x="94" y="118" width="12" height="52" rx="6" fill="#4a3010"/>
+      <path d="M94 148 Q78 155 74 166" stroke="#4a3010" stroke-width="8" stroke-linecap="round" fill="none"/>
+      <path d="M106 150 Q120 157 124 166" stroke="#4a3010" stroke-width="8" stroke-linecap="round" fill="none"/>
+      <ellipse cx="100" cy="98" rx="52" ry="57" fill="#2d5018"/>
+      <ellipse cx="100" cy="86" rx="42" ry="45" fill="#3d6822"/>
+      <ellipse cx="100" cy="75" rx="30" ry="32" fill="#4d8030"/>
+      <ellipse cx="100" cy="65" rx="20" ry="21" fill="#5d9838"/>
+      <path d="M100 43 C100 43 90 27 94 15 C97 6 103 11 100 23 C103 11 110 8 113 18 C116 29 100 43 100 43Z" fill="#78c040"/>
+      <path d="M82 71 C82 71 64 69 60 55 C57 45 65 43 71 51 C65 43 70 35 78 45 C84 53 82 71 82 71Z" fill="#4a8828"/>
+      <path d="M118 71 C118 71 136 69 140 55 C143 45 135 43 129 51 C135 43 130 35 122 45 C116 53 118 71 118 71Z" fill="#4a8828"/>
+      <ellipse cx="87" cy="76" rx="10" ry="12" fill="#eef8d8"/>
+      <ellipse cx="113" cy="76" rx="10" ry="12" fill="#eef8d8"/>
+      <ellipse cx="87" cy="78" rx="7" ry="8" fill="#3a7818"/>
+      <ellipse cx="113" cy="78" rx="7" ry="8" fill="#3a7818"/>
+      <circle cx="88" cy="78" r="4.5" fill="#1a2808"/>
+      <circle cx="114" cy="78" r="4.5" fill="#1a2808"/>
+      <circle cx="89.5" cy="76.5" r="1.5" fill="white"/>
+      <circle cx="115.5" cy="76.5" r="1.5" fill="white"/>
+      <path d="M90 92 Q100 100 110 92" stroke="#3a5a18" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <ellipse cx="76" cy="87" rx="7" ry="5" fill="rgba(120,200,60,.33)"/>
+      <ellipse cx="124" cy="87" rx="7" ry="5" fill="rgba(120,200,60,.33)"/>
+      <circle cx="68" cy="61" r="3" fill="#8aca40" opacity=".5"/>
+      <circle cx="134" cy="57" r="2.5" fill="#7aba30" opacity=".45"/>
+      <circle cx="100" cy="51" r="2" fill="#a0da50" opacity=".6"/>
+    </svg>
+    <div class="title-kicker">A tale of roots &amp; wonder</div>
+    <div class="title-main">The Verdant<br>Kingdom</div>
+    <div class="title-rule"></div>
+    <div class="title-sub">A companion lives here.<br>They have been waiting for you.</div>
+    <button class="btn-start" onclick="startGame()">Begin the Story</button>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="screen" id="screen-home">
+  <div class="toast" id="toast"></div>
+  <div class="home-scene">
+    <svg viewBox="0 0 430 780" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <rect width="430" height="780" fill="#0a1406"/>
+      <ellipse cx="215" cy="0" rx="280" ry="210" fill="#162808" opacity=".9"/>
+      <!-- Moon -->
+      <circle cx="340" cy="62" r="26" fill="#e4d8b8" opacity=".65"/>
+      <circle cx="352" cy="54" r="21" fill="#0a1406"/>
+      <!-- Stars -->
+      <circle cx="38" cy="28" r="1.5" fill="white" opacity=".65"/>
+      <circle cx="88" cy="16" r="1" fill="white" opacity=".6"/>
+      <circle cx="158" cy="23" r="1.5" fill="white" opacity=".5"/>
+      <circle cx="198" cy="9" r="1" fill="white" opacity=".8"/>
+      <circle cx="268" cy="19" r="1.5" fill="white" opacity=".6"/>
+      <circle cx="378" cy="33" r="1" fill="white" opacity=".5"/>
+      <circle cx="68" cy="53" r="1" fill="white" opacity=".4"/>
+      <circle cx="290" cy="42" r="1" fill="white" opacity=".45"/>
+      <!-- Back trees -->
+      <ellipse cx="25" cy="400" rx="58" ry="310" fill="#0a1e04"/>
+      <ellipse cx="405" cy="390" rx="62" ry="330" fill="#0a1e04"/>
+      <ellipse cx="78" cy="380" rx="48" ry="265" fill="#0f2406"/>
+      <ellipse cx="358" cy="375" rx="52" ry="285" fill="#0f2406"/>
+      <!-- Mid trees -->
+      <ellipse cx="38" cy="450" rx="40" ry="185" fill="#162e08"/>
+      <ellipse cx="392" cy="440" rx="42" ry="195" fill="#162e08"/>
+      <ellipse cx="98" cy="465" rx="33" ry="155" fill="#1a3a0a"/>
+      <ellipse cx="338" cy="455" rx="36" ry="165" fill="#1a3a0a"/>
+      <!-- Hanging vines -->
+      <path d="M55 0 Q50 90 60 190 Q54 265 50 360" stroke="#1e4008" stroke-width="2" fill="none" opacity=".5"/>
+      <path d="M375 0 Q380 95 370 205 Q376 285 378 385" stroke="#1e4008" stroke-width="2" fill="none" opacity=".45"/>
+      <ellipse cx="60" cy="195" rx="9" ry="5" fill="#2a5a10" opacity=".6"/>
+      <ellipse cx="370" cy="210" rx="8" ry="5" fill="#2a5a10" opacity=".5"/>
+      <!-- Mushroom -->
+      <ellipse cx="128" cy="628" rx="13" ry="6" fill="#2a1406"/>
+      <rect x="125" y="602" width="6" height="28" rx="3" fill="#4a2008"/>
+      <ellipse cx="128" cy="601" rx="19" ry="9" fill="#b83018"/>
+      <circle cx="124" cy="599" r="2" fill="white" opacity=".65"/>
+      <circle cx="131" cy="597" r="1.5" fill="white" opacity=".65"/>
+      <circle cx="137" cy="601" r="1.8" fill="white" opacity=".65"/>
+      <!-- Fern ground layer -->
+      <path d="M0 685 Q30 645 65 685 Q100 645 135 685 Q170 645 205 685 Q240 645 275 685 Q310 645 345 685 Q380 645 430 685 L430 780 L0 780Z" fill="#162808"/>
+      <!-- Ground -->
+      <rect x="0" y="705" width="430" height="75" fill="#0f2004"/>
+      <!-- Grass tufts -->
+      <path d="M18 705 Q23 683 27 705" stroke="#2e5010" stroke-width="2.2" fill="none"/>
+      <path d="M28 705 Q34 678 38 705" stroke="#3a6018" stroke-width="2.5" fill="none"/>
+      <path d="M384 705 Q388 680 393 705" stroke="#2e5010" stroke-width="2.2" fill="none"/>
+      <path d="M398 705 Q402 685 406 705" stroke="#3a6018" stroke-width="2" fill="none"/>
+      <!-- Mossy log -->
+      <rect x="8" y="700" width="88" height="20" rx="10" fill="#1e1004"/>
+      <ellipse cx="52" cy="700" rx="44" ry="7" fill="#2e5010" opacity=".65"/>
+      <!-- Flowers -->
+      <circle cx="288" cy="700" r="5" fill="#e0a0c0"/>
+      <circle cx="288" cy="700" r="2" fill="#f0d858"/>
+      <circle cx="318" cy="703" r="4" fill="#e8c038"/>
+      <circle cx="318" cy="703" r="1.5" fill="#f8e870"/>
+      <!-- Ground glow / clearing -->
+      <ellipse cx="215" cy="738" rx="68" ry="18" fill="#1e3808" opacity=".5"/>
+      <!-- Firefly dots -->
+      <circle cx="58" cy="505" r="2.5" fill="#c8f07a" opacity=".45"/>
+      <circle cx="348" cy="485" r="2" fill="#c8f07a" opacity=".4"/>
+      <circle cx="198" cy="525" r="2" fill="#d8ff9a" opacity=".3"/>
+    </svg>
+  </div>
+  <div id="motesContainer"></div>
+  <div class="home-content">
+    <div class="companion-header">
+      <div class="comp-name-lbl">Grove</div>
+      <div class="bars-row">
+        <div class="bar-item">
+          <div class="bar-ico">&#10084;&#65039;</div>
+          <div class="bar-track"><div class="bar-fill bar-health" id="healthBar" style="width:80%"></div></div>
+        </div>
+        <div class="bar-item">
+          <div class="bar-ico">&#9889;</div>
+          <div class="bar-track"><div class="bar-fill bar-energy" id="energyBar" style="width:65%"></div></div>
+        </div>
+      </div>
+      <div class="water-row">
+        <svg width="14" height="18" viewBox="0 0 16 20" fill="none"><path d="M8 1 Q14 8 14 12 A6 6 0 0 1 2 12 Q2 8 8 1Z" fill="#4a9ab8"/><path d="M6 14 Q8 16 10 14" stroke="rgba(255,255,255,.4)" stroke-width="1" fill="none" stroke-linecap="round"/></svg>
+        <div class="water-num" id="waterCount">0</div>
+      </div>
+    </div>
+    <div class="grove-home-wrap" id="groveWrap" onclick="petGrove()">
+      <svg width="150" height="190" viewBox="0 0 130 195" fill="none">
+        <ellipse cx="65" cy="188" rx="29" ry="6" fill="rgba(20,50,8,.45)"/>
+        <rect x="59" y="130" width="12" height="58" rx="6" fill="#4a3010"/>
+        <path d="M59 165 Q44 172 40 183" stroke="#4a3010" stroke-width="9" stroke-linecap="round" fill="none"/>
+        <path d="M71 168 Q84 175 88 184" stroke="#4a3010" stroke-width="9" stroke-linecap="round" fill="none"/>
+        <path d="M30 112 Q18 98 22 84" stroke="#4a3010" stroke-width="8" stroke-linecap="round" fill="none"/>
+        <path d="M100 112 Q112 98 108 84" stroke="#4a3010" stroke-width="8" stroke-linecap="round" fill="none"/>
+        <ellipse cx="65" cy="100" rx="46" ry="54" fill="#2d5018"/>
+        <ellipse cx="65" cy="88" rx="37" ry="43" fill="#3d6822"/>
+        <ellipse cx="65" cy="77" rx="27" ry="31" fill="#4d8030"/>
+        <ellipse cx="65" cy="67" rx="19" ry="21" fill="#5d9838"/>
+        <path d="M65 45 C65 45 55 29 59 17 C62 8 68 13 65 25 C68 13 75 10 78 20 C81 31 65 45 65 45Z" fill="#78c040"/>
+        <path d="M47 74 C47 74 30 72 26 58 C23 48 31 46 37 54 C31 46 36 38 44 48 C50 56 47 74 47 74Z" fill="#4a8828"/>
+        <path d="M83 74 C83 74 100 72 104 58 C107 48 99 46 93 54 C99 46 94 38 86 48 C80 56 83 74 83 74Z" fill="#4a8828"/>
+        <ellipse cx="52" cy="78" rx="11" ry="13" fill="#eef8d8"/>
+        <ellipse cx="78" cy="78" rx="11" ry="13" fill="#eef8d8"/>
+        <ellipse cx="52" cy="80" rx="8" ry="9" fill="#3a7818"/>
+        <ellipse cx="78" cy="80" rx="8" ry="9" fill="#3a7818"/>
+        <circle cx="53" cy="80" r="5" fill="#1a2808"/>
+        <circle cx="79" cy="80" r="5" fill="#1a2808"/>
+        <circle cx="54.5" cy="78.5" r="1.8" fill="white"/>
+        <circle cx="80.5" cy="78.5" r="1.8" fill="white"/>
+        <ellipse cx="65" cy="91" rx="4" ry="2.5" fill="#3a5a18"/>
+        <path d="M56 100 Q65 108 74 100" stroke="#3a5a18" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <ellipse cx="40" cy="94" rx="7" ry="5" fill="rgba(110,190,55,.33)"/>
+        <ellipse cx="90" cy="94" rx="7" ry="5" fill="rgba(110,190,55,.33)"/>
+        <circle cx="47" cy="64" r="3" fill="#9ad050" opacity=".5"/>
+        <circle cx="83" cy="59" r="2.5" fill="#8ac040" opacity=".48"/>
+        <circle cx="65" cy="55" r="2" fill="#aae060" opacity=".6"/>
+        <circle cx="25" cy="100" r="2" fill="#8ac040" opacity=".4"/>
+        <circle cx="105" cy="102" r="2" fill="#8ac040" opacity=".4"/>
+      </svg>
+    </div>
+    <div class="grove-speech" id="groveSpeech">
+      <div class="grove-speech-text" id="speechText">The forest is glad you are here.</div>
+    </div>
+  </div>
+</div>
+
+<!-- EXPLORE -->
+<div class="screen" id="screen-explore">
+  <div class="exp-bg"></div>
+  <div class="exp-inner">
+    <div class="exp-header">
+      <div class="exp-title">Go Fish</div>
+      <div class="water-badge">
+        <svg width="11" height="15" viewBox="0 0 16 20" fill="none"><path d="M8 1 Q14 8 14 12 A6 6 0 0 1 2 12 Q2 8 8 1Z" fill="#4a9ab8"/></svg>
+        <div class="water-badge-num" id="exploreWater">0</div>
+      </div>
+    </div>
+    <div class="game-table">
+      <div class="hand-lbl">Grove's hand</div>
+      <div class="hand-area" id="cpuHand"></div>
+      <div class="hand-lbl">Books won</div>
+      <div class="books-area" id="booksArea"><div style="font-size:11px;color:#3a5a20;padding:3px">None yet...</div></div>
+      <div class="game-log" id="gameLog">Grove shuffles a worn old deck with a quiet smile.</div>
+      <div class="hand-lbl">Your hand</div>
+      <div class="hand-area" id="playerHand"></div>
+      <div class="ask-row" id="askRow"></div>
+    </div>
+    <div class="gameover-wrap" id="gameoverWrap">
+      <div class="go-icon" id="goIcon">🌿</div>
+      <div class="go-title" id="goTitle">You won!</div>
+      <div class="go-msg" id="goMsg">Grove smiles warmly.</div>
+      <div class="go-reward" id="goReward" style="display:none">
+        <svg width="14" height="18" viewBox="0 0 16 20" fill="none"><path d="M8 1 Q14 8 14 12 A6 6 0 0 1 2 12 Q2 8 8 1Z" fill="#4a9ab8"/></svg>
+        <span id="rewardTxt">+5 Water Drops</span>
+      </div>
+      <button class="btn-again" onclick="initGoFish()">Play again</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV BAR -->
+<nav class="nav-bar">
+  <button class="nav-btn active" id="nav-home" onclick="navTo('home')">
+    <div class="nav-ico">
+      <svg viewBox="0 0 32 32" fill="none">
+        <!-- Cabin -->
+        <path d="M6 18 L16 8 L26 18 L26 27 L6 27Z" stroke="#5a8040" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+        <rect x="13" y="21" width="6" height="6" rx="1" stroke="#5a8040" stroke-width="1.2" fill="none"/>
+        <rect x="8" y="19" width="4" height="4" rx=".5" stroke="#5a8040" stroke-width="1" fill="none"/>
+        <line x1="10" y1="19" x2="10" y2="23" stroke="#5a8040" stroke-width=".8"/>
+        <line x1="8" y1="21" x2="12" y2="21" stroke="#5a8040" stroke-width=".8"/>
+        <!-- Vines -->
+        <path d="M6 20 Q3.5 23 4.5 27" stroke="#5a8040" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <path d="M4.5 23 Q2.5 21 3.5 19" stroke="#5a8040" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <ellipse cx="3.5" cy="23" rx="2" ry="1.4" fill="#3a5a20" opacity=".85"/>
+        <path d="M26 20 Q28.5 23 27.5 27" stroke="#5a8040" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <path d="M27.5 23 Q29.5 21 28.5 19" stroke="#5a8040" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <ellipse cx="28.5" cy="23.5" rx="2" ry="1.4" fill="#3a5a20" opacity=".85"/>
+        <!-- Roof vine -->
+        <path d="M16 8 Q18 6 20 8" stroke="#5a8040" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <ellipse cx="20" cy="7.5" rx="1.8" ry="1.2" fill="#3a5a20" opacity=".7"/>
+      </svg>
+    </div>
+    <div class="nav-lbl">Home</div>
+  </button>
+
+  <button class="nav-btn" id="nav-explore" onclick="navTo('explore')">
+    <div class="nav-ico">
+      <svg viewBox="0 0 32 32" fill="none">
+        <!-- Map parchment -->
+        <rect x="5" y="6" width="22" height="20" rx="2" stroke="#5a8040" stroke-width="1.5" fill="none"/>
+        <path d="M9 6 L9 26" stroke="#5a8040" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M23 6 L23 26" stroke="#5a8040" stroke-width="1.4" stroke-linecap="round"/>
+        <!-- Map path -->
+        <path d="M12 11 Q16 9 20 12 Q23 14.5 20 17.5 Q16 21 13 19" stroke="#5a8040" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <!-- X -->
+        <line x1="15" y1="15" x2="18" y2="18" stroke="#b03030" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="18" y1="15" x2="15" y2="18" stroke="#b03030" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Compass -->
+        <circle cx="20.5" cy="11" r="2.2" stroke="#5a8040" stroke-width=".9" fill="none"/>
+        <line x1="20.5" y1="9.3" x2="20.5" y2="8.4" stroke="#5a8040" stroke-width=".9" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="nav-lbl">Explore</div>
+  </button>
+
+  <button class="nav-btn" id="nav-backpack" onclick="navTo('backpack')">
+    <div class="nav-ico">
+      <svg viewBox="0 0 32 32" fill="none">
+        <!-- Bag body -->
+        <rect x="8" y="11" width="16" height="16" rx="3" stroke="#5a8040" stroke-width="1.5" fill="none"/>
+        <!-- Top handle -->
+        <path d="M12 11 Q12 7 16 7 Q20 7 20 11" stroke="#5a8040" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- Front pocket -->
+        <rect x="11" y="18.5" width="10" height="5.5" rx="1.5" stroke="#5a8040" stroke-width="1.2" fill="none"/>
+        <line x1="11" y1="21.5" x2="21" y2="21.5" stroke="#5a8040" stroke-width=".8" stroke-dasharray="2 1.5"/>
+        <!-- Sunflower pin -->
+        <circle cx="20" cy="14.5" r="3.2" stroke="#b89020" stroke-width="1" fill="none"/>
+        <circle cx="20" cy="14.5" r="1.4" fill="#b89020"/>
+        <line x1="20" y1="10.8" x2="20" y2="10" stroke="#b89020" stroke-width="1" stroke-linecap="round"/>
+        <line x1="20" y1="18.2" x2="20" y2="19" stroke="#b89020" stroke-width="1" stroke-linecap="round"/>
+        <line x1="16.6" y1="14.5" x2="15.8" y2="14.5" stroke="#b89020" stroke-width="1" stroke-linecap="round"/>
+        <line x1="23.4" y1="14.5" x2="24.2" y2="14.5" stroke="#b89020" stroke-width="1" stroke-linecap="round"/>
+        <line x1="17.7" y1="12" x2="17" y2="11.3" stroke="#b89020" stroke-width="1" stroke-linecap="round"/>
+        <line x1="22.3" y1="17" x2="23" y2="17.7" stroke="#b89020" stroke-width="1" stroke-linecap="round"/>
+        <line x1="22.3" y1="12" x2="23" y2="11.3" stroke="#b89020" stroke-width="1" stroke-linecap="round"/>
+        <line x1="17.7" y1="17" x2="17" y2="17.7" stroke="#b89020" stroke-width="1" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="nav-lbl">Backpack</div>
+  </button>
+
+  <button class="nav-btn" id="nav-settings" onclick="navTo('settings')">
+    <div class="nav-ico">
+      <svg viewBox="0 0 32 32" fill="none">
+        <!-- Cog teeth -->
+        <path d="M13 5 L13 3.5 L19 3.5 L19 5 Q21.8 5.9 23.6 7.8 L25 7 L28.5 13 L27 13.8 Q27.5 15.3 27.5 16 Q27.5 16.7 27 18.2 L28.5 19 L25 25 L23.6 24.2 Q21.8 26.1 19 27 L19 28.5 L13 28.5 L13 27 Q10.2 26.1 8.4 24.2 L7 25 L3.5 19 L5 18.2 Q4.5 16.7 4.5 16 Q4.5 15.3 5 13.8 L3.5 13 L7 7 L8.4 7.8 Q10.2 5.9 13 5Z" stroke="#5a8040" stroke-width="1.3" fill="none" stroke-linejoin="round"/>
+        <circle cx="16" cy="16" r="4.5" stroke="#5a8040" stroke-width="1.3" fill="none"/>
+        <!-- Vine left -->
+        <path d="M3.5 13 Q1.2 15 2 17 Q1.2 19 3.5 19" stroke="#5a8040" stroke-width="1.1" fill="none" stroke-linecap="round" opacity=".6"/>
+        <ellipse cx="1.5" cy="16" rx="1.4" ry="1" fill="#3a5a20" opacity=".75"/>
+        <!-- Vine right -->
+        <path d="M28.5 13 Q30.8 15 30 17 Q30.8 19 28.5 19" stroke="#5a8040" stroke-width="1.1" fill="none" stroke-linecap="round" opacity=".6"/>
+        <ellipse cx="30.5" cy="16" rx="1.4" ry="1" fill="#3a5a20" opacity=".75"/>
+      </svg>
+    </div>
+    <div class="nav-lbl">Settings</div>
+  </button>
+</nav>
+
+</div>
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────
+var G={health:80,energy:65,water:0};
+var currentScreen='home';
+
+var IDLE_LINES=["The forest is glad you are here.","Something rustles nearby... probably friendly.","I found a new path today. We should explore it.","The moon was beautiful last night.","I kept a spot warm for you.","Do you hear the trees? They are talking about us.","Stay as long as you like.","I was just thinking about you.","The fireflies came back tonight.","A new flower bloomed near the old log."];
+var PET_LINES=["...","Your hands are warm.","I feel everything you mean by that.","Stay close.","A soft, contented sigh...","I trust you completely.","Don't stop.","Everything is okay right now."];
+
+// ── UTILS ──────────────────────────────────────────────────────────────────
+function rand(a){return a[Math.floor(Math.random()*a.length)]}
+
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('show')},1900);
+}
+
+function setSpeech(txt){
+  var el=document.getElementById('speechText');
+  el.style.opacity='0';
+  setTimeout(function(){el.textContent=txt;el.style.opacity='1'},200);
+}
+
+function updateWater(){
+  document.getElementById('waterCount').textContent=G.water;
+  document.getElementById('exploreWater').textContent=G.water;
+}
+
+function petGrove(){
+  var w=document.getElementById('groveWrap');
+  w.classList.remove('pop');void w.offsetWidth;w.classList.add('pop');
+  setTimeout(function(){w.classList.remove('pop')},600);
+  setSpeech(rand(PET_LINES));
+  showToast('Grove smiles ~');
+}
+
+// ── MOTES ──────────────────────────────────────────────────────────────────
+function spawnMotes(){
+  var c=document.getElementById('motesContainer');
+  for(var i=0;i<12;i++){
+    (function(idx){
+      var m=document.createElement('div');m.className='mote';
+      var sz=1.5+Math.random()*3;
+      m.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(5+Math.random()*90)+'%;bottom:'+(15+Math.random()*55)+'%;animation-duration:'+(4+Math.random()*6)+'s;animation-delay:'+(idx*.45+Math.random()*1.5)+'s';
+      c.appendChild(m);
+    })(i);
+  }
+}
+
+// ── NAV ────────────────────────────────────────────────────────────────────
+function navTo(id){
+  if(id==='backpack'||id==='settings'){showToast('Coming soon...');return;}
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active')});
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active')});
+  if(id==='home'){document.getElementById('screen-home').classList.add('active');}
+  else if(id==='explore'){
+    document.getElementById('screen-explore').classList.add('active');
+    if(currentScreen!=='explore')initGoFish();
+  }
+  document.getElementById('nav-'+id).classList.add('active');
+  currentScreen=id;
+}
+
+// ── START ──────────────────────────────────────────────────────────────────
+function startGame(){
+  document.getElementById('screen-title').classList.remove('active');
+  document.getElementById('screen-home').classList.add('active');
+  spawnMotes();updateWater();
+  setInterval(function(){if(currentScreen==='home')setSpeech(rand(IDLE_LINES))},9000);
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+//  GO FISH ENGINE
+// ══════════════════════════════════════════════════════════════════════════
+var GF={deck:[],ply:[],cpu:[],pond:[],plyBooks:[],cpuBooks:[],plyTurn:true,busy:false};
+var RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+var SUITS=['♠','♥','♦','♣'];
+var IS_RED={♥:true,♦:true};
+
+function buildDeck(){
+  var d=[];
+  RANKS.forEach(function(r){SUITS.forEach(function(s){d.push({r:r,s:s})})});
+  return d;
+}
+function shuffle(a){
+  for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}
+  return a;
+}
+function cardEl(c,faceup){
+  var d=document.createElement('div');
+  if(!faceup){d.className='card back';return d;}
+  d.className='card '+(IS_RED[c.s]?'red':'black');
+  d.innerHTML='<div class="card-rank">'+c.r+'</div><div class="card-suit">'+c.s+'</div>';
+  return d;
+}
+function hasRank(hand,r){return hand.some(function(c){return c.r===r})}
+function takeRank(hand,r){
+  var taken=hand.filter(function(c){return c.r===r});
+  var left=hand.filter(function(c){return c.r!==r});
+  hand.length=0;left.forEach(function(c){hand.push(c)});
+  return taken;
+}
+function checkBooks(hand,books){
+  var cnt={};hand.forEach(function(c){cnt[c.r]=(cnt[c.r]||0)+1});
+  Object.keys(cnt).forEach(function(r){
+    if(cnt[r]===4){books.push(r);var nw=hand.filter(function(c){return c.r!==r});hand.length=0;nw.forEach(function(c){hand.push(c)});}
+  });
+}
+function log(msg){document.getElementById('gameLog').textContent=msg}
+function renderHands(){
+  var ch=document.getElementById('cpuHand');ch.innerHTML='';
+  if(GF.cpu.length===0){ch.innerHTML='<div style="font-size:11px;color:#3a5a20;padding:6px">No cards</div>';}
+  else GF.cpu.forEach(function(c){ch.appendChild(cardEl(c,false))});
+
+  var ph=document.getElementById('playerHand');ph.innerHTML='';
+  if(GF.ply.length===0){ph.innerHTML='<div style="font-size:11px;color:#3a5a20;padding:6px">No cards</div>';}
+  else GF.ply.forEach(function(c){ph.appendChild(cardEl(c,true))});
+
+  var ba=document.getElementById('booksArea');ba.innerHTML='';
+  var anyBook=false;
+  GF.plyBooks.forEach(function(r){anyBook=true;var d=document.createElement('div');d.className='book-chip';d.textContent='You: '+r+'s';ba.appendChild(d)});
+  GF.cpuBooks.forEach(function(r){anyBook=true;var d=document.createElement('div');d.className='book-chip';d.style.cssText='color:#90b870;background:rgba(80,120,40,.15)';d.textContent='Grove: '+r+'s';ba.appendChild(d)});
+  if(!anyBook)ba.innerHTML='<div style="font-size:11px;color:#3a5a20;padding:3px">None yet...</div>';
+
+  renderAsk();
+}
+function renderAsk(){
+  var ar=document.getElementById('askRow');ar.innerHTML='';
+  if(!GF.plyTurn||GF.busy)return;
+  var ranks={};GF.ply.forEach(function(c){ranks[c.r]=true});
+  Object.keys(ranks).forEach(function(r){
+    var b=document.createElement('button');b.className='ask-btn';b.textContent='Ask for '+r+'s';
+    b.onclick=(function(rk){return function(){playerAsks(rk)}})(r);
+    ar.appendChild(b);
+  });
+  if(!Object.keys(ranks).length)ar.innerHTML='<div style="font-size:11px;color:#3a5a20">Draw from pond...</div>';
+}
+function initGoFish(){
+  document.getElementById('gameoverWrap').classList.remove('show');
+  GF.deck=shuffle(buildDeck());
+  GF.ply=[];GF.cpu=[];GF.plyBooks=[];GF.cpuBooks=[];GF.pond=[];GF.plyTurn=true;GF.busy=false;
+  for(var i=0;i<7;i++){GF.ply.push(GF.deck.pop());GF.cpu.push(GF.deck.pop())}
+  GF.pond=GF.deck;
+  checkBooks(GF.ply,GF.plyBooks);checkBooks(GF.cpu,GF.cpuBooks);
+  log('Grove deals the cards with a quiet smile. "Shall we play?"');
+  renderHands();
+}
+function playerAsks(r){
+  if(!GF.plyTurn||GF.busy)return;GF.busy=true;
+  if(hasRank(GF.cpu,r)){
+    var taken=takeRank(GF.cpu,r);taken.forEach(function(c){GF.ply.push(c)});
+    log('Grove had '+r+'s! You took '+taken.length+' card'+(taken.length>1?'s':'')+'. Ask again!');
+    checkBooks(GF.ply,GF.plyBooks);GF.busy=false;renderHands();checkEnd();
+  } else {
+    log('Go Fish! You draw from the pond...');
+    if(GF.pond.length){
+      GF.ply.push(GF.pond.pop());
+      var drew=GF.ply[GF.ply.length-1];
+      if(drew.r===r){log('You drew a '+r+'! Lucky — ask again!');checkBooks(GF.ply,GF.plyBooks);GF.busy=false;renderHands();checkEnd();}
+      else{log('You drew a '+drew.r+'. Grove\'s turn...');checkBooks(GF.ply,GF.plyBooks);renderHands();GF.plyTurn=false;GF.busy=false;renderAsk();if(!checkEnd())setTimeout(cpuTurn,1200);}
+    } else {
+      log('The pond is empty. Grove\'s turn...');GF.plyTurn=false;GF.busy=false;renderAsk();if(!checkEnd())setTimeout(cpuTurn,1200);
+    }
+  }
+}
+function cpuTurn(){
+  if(GF.plyTurn||GF.busy)return;
+  if(GF.cpu.length===0){endGame();return;}
+  GF.busy=true;
+  var ranks={};GF.cpu.forEach(function(c){ranks[c.r]=true});
+  var rlist=Object.keys(ranks);
+  var ask=rlist[Math.floor(Math.random()*rlist.length)];
+  log('Grove asks quietly: "Do you have any '+ask+'s?"');
+  setTimeout(function(){
+    if(hasRank(GF.ply,ask)){
+      var taken=takeRank(GF.ply,ask);taken.forEach(function(c){GF.cpu.push(c)});
+      log('Grove takes your '+ask+'s! ('+taken.length+' card'+(taken.length>1?'s':'')+')');
+      checkBooks(GF.cpu,GF.cpuBooks);GF.busy=false;renderHands();
+      if(!checkEnd())setTimeout(cpuTurn,1200);
+    } else {
+      if(GF.pond.length)GF.cpu.push(GF.pond.pop());
+      log(GF.pond.length>=0?'Go Fish! Grove draws. Your turn.':'The pond is empty. Your turn.');
+      checkBooks(GF.cpu,GF.cpuBooks);GF.plyTurn=true;GF.busy=false;renderHands();checkEnd();
+    }
+  },950);
+}
+function checkEnd(){
+  var pondDone=GF.pond.length===0;
+  var bothEmpty=GF.ply.length===0&&GF.cpu.length===0;
+  var oneEmpty=GF.ply.length===0||GF.cpu.length===0;
+  if(bothEmpty||(pondDone&&oneEmpty)){endGame();return true;}
+  return false;
+}
+function endGame(){
+  var ps=GF.plyBooks.length,cs=GF.cpuBooks.length;
+  var won=ps>cs,tie=ps===cs;
+  document.getElementById('goIcon').textContent=won?'🌿':(tie?'🍄':'🌑');
+  document.getElementById('goTitle').textContent=won?'You won!':(tie?'A tie!':'Grove wins this round.');
+  document.getElementById('goMsg').textContent=won
+    ?'Grove smiles warmly. "Well played, friend. '+ps+' books to '+cs+'."'
+    :tie?'"Equal roots," Grove says. "'+ps+' books each."'
+    :'"The forest teaches patience," Grove says gently. "'+cs+' to '+ps+'."';
+  var rw=document.getElementById('goReward');
+  if(won){G.water+=5;updateWater();rw.style.display='flex';document.getElementById('rewardTxt').textContent='+5 Water Drops';}
+  else rw.style.display='none';
+  document.getElementById('gameoverWrap').classList.add('show');
+}
+</script>
+</body>
+</html>
