@@ -1,0 +1,18 @@
+{
+  "name": "The Verdant Kingdom",
+  "short_name": "Verdant",
+  "description": "A companion lives here. They have been waiting for you.",
+  "start_url": "/verdant-kingdom/",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#2c1f0e",
+  "theme_color": "#2c1f0e",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

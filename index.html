@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Verdant Kingdom">
+<meta name="theme-color" content="#2c1f0e">
+<title>The Verdant Kingdom</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;700;800;900&display=swap');
+
+:root {
+  --paper: #f5ede0;
+  --paper2: #ede0cc;
+  --ink: #2c1f0e;
+  --ink2: #5a3e28;
+  --ink3: #8a6a4a;
+  --moss: #4a6a28;
+  --moss2: #6a9a3a;
+  --moss3: #9aca5a;
+  --amber: #c8820a;
+  --rust: #8a3a18;
+  --sky: #7aa8b8;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%; width: 100%; overflow: hidden;
+  background: var(--ink);
+  font-family: 'Nunito', sans-serif;
+}
+
+/* ── TEXTURE OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 1000; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.4;
+}
+
+/* ── MAIN APP SHELL ── */
+#app {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  background: var(--paper);
+  max-width: 430px; margin: 0 auto;
+  overflow: hidden;
+}
+
+/* ── SCREENS ── */
+.screen { display: none; flex-direction: column; height: 100%; }
+.screen.active { display: flex; }
+
+/* ══════════════════════════════
+   TITLE SCREEN
+══════════════════════════════ */
+#screen-title {
+  align-items: center; justify-content: center;
+  background: var(--paper);
+  padding: 40px 32px;
+  gap: 0;
+}
+
+.title-illustration {
+  width: 200px; height: 200px; margin-bottom: 8px;
+}
+
+.title-kicker {
+  font-family: 'Spectral', serif;
+  font-size: 11px; letter-spacing: .22em;
+  color: var(--ink3); text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.title-main {
+  font-family: 'Spectral', serif;
+  font-size: 32px; font-weight: 600;
+  color: var(--ink); line-height: 1.1;
+  text-align: center; margin-bottom: 6px;
+}
+
+.title-sub {
+  font-family: 'Spectral', serif;
+  font-style: italic; font-size: 14px;
+  color: var(--ink3); text-align: center;
+  margin-bottom: 48px; line-height: 1.6;
+}
+
+.title-border {
+  width: 80px; height: 1px;
+  background: var(--ink3); opacity: .35;
+  margin: 0 auto 48px;
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--paper);
+  border: none; border-radius: 99px;
+  padding: 16px 48px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px; font-weight: 800;
+  letter-spacing: .06em; text-transform: uppercase;
+  cursor: pointer;
+  transition: transform .15s, opacity .15s;
+}
+.btn-primary:active { transform: scale(.97); opacity: .85; }
+
+/* ══════════════════════════════
+   MAIN GAME SCREEN
+══════════════════════════════ */
+#screen-game {
+  background: var(--paper);
+}
+
+/* Scene strip */
+.scene-strip {
+  position: relative;
+  height: 52vw; max-height: 230px; min-height: 160px;
+  overflow: hidden; flex-shrink: 0;
+  background: #d4e8c2;
+}
+
+.scene-svg {
+  width: 100%; height: 100%;
+}
+
+/* HUD bar */
+.hud-bar {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(44,31,14,.1);
+  flex-shrink: 0;
+  background: var(--paper);
+}
+
+.hud-title {
+  font-family: 'Spectral', serif;
+  font-size: 13px; font-weight: 600;
+  color: var(--ink2); letter-spacing: .06em;
+}
+
+.hud-stats { display: flex; gap: 8px; }
+
+.stat-pill {
+  display: flex; align-items: center; gap: 4px;
+  background: var(--paper2);
+  border-radius: 99px; padding: 4px 10px;
+  font-size: 11px; font-weight: 800;
+  color: var(--ink2);
+}
+.stat-pip { width: 7px; height: 7px; border-radius: 50%; }
+
+/* Companion + speech */
+.companion-section {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 0 24px 4px;
+  min-height: 0;
+}
+
+.speech-bubble {
+  background: white;
+  border: 1.5px solid var(--paper2);
+  border-radius: 18px 18px 18px 4px;
+  padding: 12px 16px;
+  max-width: 280px; width: 100%;
+  margin-bottom: 14px;
+  min-height: 56px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 2px 3px 0 rgba(44,31,14,.07);
+}
+
+.speech-text {
+  font-family: 'Spectral', serif;
+  font-style: italic; font-size: 14px;
+  color: var(--ink); line-height: 1.55;
+  text-align: center;
+  transition: opacity .2s;
+}
+
+.grove-wrap {
+  cursor: pointer;
+  user-select: none;
+  animation: grove-idle 4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes grove-idle { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.grove-wrap.anim-bounce { animation: grove-bounce .5s ease forwards; }
+@keyframes grove-bounce {
+  0%{transform:translateY(0) scale(1)}
+  30%{transform:translateY(-14px) scale(1.07)}
+  60%{transform:translateY(2px) scale(.97)}
+  85%{transform:translateY(-4px) scale(1.02)}
+  100%{transform:translateY(0) scale(1)}
+}
+.grove-wrap.anim-shake { animation: grove-shake .4s ease forwards; }
+@keyframes grove-shake {
+  0%,100%{transform:rotate(0)} 25%{transform:rotate(-7deg)} 75%{transform:rotate(7deg)}
+}
+
+.grove-name {
+  font-family: 'Spectral', serif;
+  font-size: 17px; font-weight: 600;
+  color: var(--ink); text-align: center;
+  margin-top: 6px;
+}
+.grove-bond {
+  font-size: 11px; font-weight: 700;
+  color: var(--moss); text-align: center;
+  margin-top: 2px; letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.bond-bar-wrap {
+  width: 120px; height: 3px;
+  background: var(--paper2); border-radius: 99px;
+  overflow: hidden; margin: 6px auto 0;
+}
+.bond-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--moss), var(--moss3));
+  border-radius: 99px;
+  transition: width .9s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* ── BOTTOM PANEL ── */
+.bottom-panel {
+  background: white;
+  border-top: 1.5px solid var(--paper2);
+  border-radius: 24px 24px 0 0;
+  padding: 14px 16px calc(16px + var(--safe-bottom));
+  flex-shrink: 0;
+  box-shadow: 0 -4px 20px rgba(44,31,14,.08);
+}
+
+.tabs-row { display: flex; gap: 6px; margin-bottom: 12px; }
+
+.tab-btn {
+  flex: 1; padding: 8px 4px;
+  background: var(--paper2);
+  border: 1.5px solid transparent;
+  border-radius: 10px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 10px; font-weight: 900;
+  color: var(--ink3);
+  cursor: pointer; letter-spacing: .05em;
+  text-transform: uppercase;
+  transition: all .18s;
+}
+.tab-btn.active {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* Journey tab */
+.act-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.act-btn {
+  background: var(--paper);
+  border: 1.5px solid var(--paper2);
+  border-radius: 14px; padding: 14px 10px;
+  cursor: pointer; text-align: center;
+  transition: all .18s;
+}
+.act-btn:active { transform: scale(.96); }
+.act-btn:hover { border-color: var(--moss2); background: #f0f8e8; }
+
+.act-ico {
+  display: block; font-size: 22px; margin-bottom: 5px;
+  line-height: 1;
+}
+.act-lbl {
+  font-size: 12px; font-weight: 800; color: var(--ink);
+  display: block;
+}
+.act-sub {
+  font-size: 10px; font-weight: 600; color: var(--ink3);
+  margin-top: 2px; display: block;
+}
+
+/* Wit Duel tab */
+.puzzle-scene {
+  background: var(--paper);
+  border: 1.5px solid var(--paper2);
+  border-radius: 12px; padding: 12px 14px;
+  font-family: 'Spectral', serif;
+  font-style: italic; font-size: 13px;
+  color: var(--ink2); line-height: 1.65;
+  margin-bottom: 10px;
+  min-height: 64px;
+}
+
+.puzzle-choices { display: flex; flex-direction: column; gap: 6px; }
+
+.p-choice {
+  background: var(--paper);
+  border: 1.5px solid var(--paper2);
+  border-radius: 10px; padding: 10px 14px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px; font-weight: 700; color: var(--ink);
+  cursor: pointer; text-align: left;
+  transition: all .16s;
+}
+.p-choice:active { transform: translateX(3px); }
+.p-choice:hover { border-color: var(--moss2); }
+.p-choice.correct { background: #edf8e0; border-color: var(--moss); color: var(--moss); pointer-events: none; }
+.p-choice.wrong { background: #fdf0ec; border-color: var(--rust); color: var(--rust); pointer-events: none; }
+
+.puzzle-result {
+  font-family: 'Spectral', serif;
+  font-style: italic; font-size: 12px;
+  color: var(--moss); min-height: 18px;
+  text-align: center; padding: 6px 0 0;
+}
+
+.btn-secondary {
+  width: 100%; margin-top: 8px;
+  background: var(--paper2); border: none;
+  border-radius: 10px; padding: 10px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px; font-weight: 800; color: var(--ink2);
+  cursor: pointer; display: none;
+  transition: background .18s;
+}
+.btn-secondary:active { background: var(--paper); }
+
+/* Whisper tab */
+.whisper-log {
+  background: var(--paper);
+  border: 1.5px solid var(--paper2);
+  border-radius: 12px; padding: 10px 12px;
+  max-height: 110px; min-height: 70px;
+  overflow-y: auto; margin-bottom: 8px;
+  font-size: 13px; line-height: 1.6;
+}
+.w-msg { margin-bottom: 5px; }
+.w-msg.you { color: var(--ink); font-weight: 700; }
+.w-msg.grove {
+  font-family: 'Spectral', serif;
+  font-style: italic; color: var(--moss);
+}
+.w-input-row { display: flex; gap: 8px; }
+.w-input {
+  flex: 1;
+  background: var(--paper);
+  border: 1.5px solid var(--paper2);
+  border-radius: 10px; padding: 10px 12px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px; color: var(--ink);
+  outline: none;
+  -webkit-appearance: none;
+}
+.w-input:focus { border-color: var(--moss2); }
+.w-input::placeholder { color: var(--ink3); opacity: .6; }
+.w-send {
+  background: var(--ink); color: var(--paper);
+  border: none; border-radius: 10px;
+  padding: 10px 16px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 12px; font-weight: 800;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.w-send:active { opacity: .75; }
+
+/* ── TOAST ── */
+.toast {
+  position: absolute; top: 60px; left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  background: var(--ink); color: var(--paper);
+  border-radius: 99px; padding: 6px 18px;
+  font-size: 11px; font-weight: 800;
+  letter-spacing: .05em;
+  z-index: 200; opacity: 0;
+  pointer-events: none;
+  transition: all .28s ease;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── CHAPTER SPLASH ── */
+.chapter-splash {
+  position: absolute; inset: 0; z-index: 300;
+  background: var(--paper);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 8px; padding: 40px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .5s;
+}
+.chapter-splash.show { opacity: 1; pointer-events: all; }
+.chapter-label {
+  font-family: 'Spectral', serif;
+  font-size: 11px; letter-spacing: .2em;
+  color: var(--ink3); text-transform: uppercase;
+}
+.chapter-title {
+  font-family: 'Spectral', serif;
+  font-size: 26px; font-weight: 600;
+  color: var(--ink); text-align: center;
+  line-height: 1.2;
+}
+.chapter-line {
+  width: 60px; height: 1px;
+  background: var(--ink3); opacity: .3;
+  margin: 8px 0;
+}
+.chapter-quote {
+  font-family: 'Spectral', serif;
+  font-style: italic; font-size: 13px;
+  color: var(--ink3); text-align: center;
+  line-height: 1.65; max-width: 260px;
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══ TITLE SCREEN ══ -->
+  <div class="screen active" id="screen-title">
+    <svg class="title-illustration" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Background circle -->
+      <circle cx="100" cy="100" r="90" fill="#e8f5d4" stroke="#c8d8a8" stroke-width="1"/>
+      <!-- Ground -->
+      <ellipse cx="100" cy="160" rx="60" ry="14" fill="#c8d8a4"/>
+      <!-- Trunk -->
+      <rect x="95" y="120" width="10" height="42" rx="5" fill="#6a4a28"/>
+      <!-- Small roots -->
+      <path d="M95 155 Q80 158 75 165" stroke="#6a4a28" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <path d="M105 158 Q118 160 122 167" stroke="#6a4a28" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <!-- Canopy layers -->
+      <ellipse cx="100" cy="105" rx="46" ry="38" fill="#3a6020"/>
+      <ellipse cx="100" cy="93" rx="36" ry="30" fill="#4a7828"/>
+      <ellipse cx="100" cy="82" rx="26" ry="22" fill="#5a9030"/>
+      <ellipse cx="100" cy="72" rx="16" ry="14" fill="#6aa838"/>
+      <!-- Leaf sprig top -->
+      <path d="M100 58 C100 58 92 44 96 34 C99 26 104 30 100 40 C104 30 110 28 110 38 C110 48 100 58 100 58Z" fill="#7ac040"/>
+      <!-- Tiny eyes -->
+      <ellipse cx="91" cy="88" rx="6" ry="7" fill="white"/>
+      <ellipse cx="109" cy="88" rx="6" ry="7" fill="white"/>
+      <circle cx="92" cy="89" r="3.5" fill="#2c1f0e"/>
+      <circle cx="110" cy="89" r="3.5" fill="#2c1f0e"/>
+      <circle cx="93" cy="88" r="1.2" fill="white"/>
+      <circle cx="111" cy="88" r="1.2" fill="white"/>
+      <!-- Smile -->
+      <path d="M93 98 Q100 104 107 98" stroke="#3a5a18" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <!-- Blush -->
+      <ellipse cx="83" cy="95" rx="5" ry="3.5" fill="rgba(160,200,80,.4)"/>
+      <ellipse cx="117" cy="95" rx="5" ry="3.5" fill="rgba(160,200,80,.4)"/>
+      <!-- Little sparkles -->
+      <circle cx="60" cy="72" r="2.5" fill="#8aca40" opacity=".6"/>
+      <circle cx="142" cy="68" r="2" fill="#7aba30" opacity=".5"/>
+      <circle cx="148" cy="95" r="1.5" fill="#9ada50" opacity=".6"/>
+      <circle cx="52" cy="100" r="1.5" fill="#7aba30" opacity=".5"/>
+      <!-- Border ring detail -->
+      <circle cx="100" cy="100" r="90" fill="none" stroke="#b8c898" stroke-width=".5" stroke-dasharray="4 6"/>
+    </svg>
+
+    <div class="title-kicker">A tale of roots &amp; wonder</div>
+    <div class="title-main">The Verdant<br>Kingdom</div>
+    <div class="title-border"></div>
+    <div class="title-sub">A companion lives here.<br>They have been waiting for you.</div>
+    <button class="btn-primary" onclick="startGame()">Begin the Story</button>
+  </div>
+
+  <!-- ══ GAME SCREEN ══ -->
+  <div class="screen" id="screen-game">
+    <div class="toast" id="toast">+Bond</div>
+
+    <!-- Chapter splash -->
+    <div class="chapter-splash" id="chapterSplash">
+      <div class="chapter-label">Chapter One</div>
+      <div class="chapter-title">The Forest<br>Remembers You</div>
+      <div class="chapter-line"></div>
+      <div class="chapter-quote">"Every great friendship begins with someone choosing to stay."</div>
+    </div>
+
+    <!-- Scene -->
+    <div class="scene-strip">
+      <svg class="scene-svg" viewBox="0 0 430 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <!-- Sky -->
+        <rect width="430" height="200" fill="#d4e8c2"/>
+        <!-- Distant hills -->
+        <ellipse cx="80" cy="200" rx="120" ry="70" fill="#b8d49a"/>
+        <ellipse cx="360" cy="200" rx="110" ry="65" fill="#b0cc90"/>
+        <ellipse cx="215" cy="200" rx="160" ry="55" fill="#c4dca8"/>
+        <!-- Far trees -->
+        <ellipse cx="30" cy="155" rx="24" ry="28" fill="#7aaa40"/>
+        <ellipse cx="400" cy="150" rx="22" ry="26" fill="#7aaa40"/>
+        <ellipse cx="60" cy="148" rx="18" ry="22" fill="#6a9a30"/>
+        <ellipse cx="375" cy="145" rx="20" ry="24" fill="#6a9a30"/>
+        <!-- Ground -->
+        <rect x="0" y="168" width="430" height="32" fill="#8ab850"/>
+        <ellipse cx="215" cy="168" rx="215" ry="12" fill="#9aca60"/>
+        <!-- Flowers -->
+        <circle cx="50" cy="168" r="3" fill="#e8c840"/>
+        <circle cx="120" cy="170" r="2.5" fill="#e8a0c0"/>
+        <circle cx="310" cy="167" r="3" fill="#e8c840"/>
+        <circle cx="380" cy="169" r="2.5" fill="#e8a0c0"/>
+        <!-- Path -->
+        <ellipse cx="215" cy="185" rx="40" ry="8" fill="#c8b880" opacity=".5"/>
+        <!-- Sun -->
+        <circle cx="360" cy="38" r="22" fill="#f8e060" opacity=".7"/>
+        <!-- Rays -->
+        <line x1="360" y1="8" x2="360" y2="2" stroke="#f8e060" stroke-width="2.5" stroke-linecap="round" opacity=".5"/>
+        <line x1="385" y1="18" x2="390" y2="13" stroke="#f8e060" stroke-width="2.5" stroke-linecap="round" opacity=".5"/>
+        <line x1="390" y1="42" x2="397" y2="42" stroke="#f8e060" stroke-width="2.5" stroke-linecap="round" opacity=".5"/>
+        <!-- Birds -->
+        <path d="M150 30 Q155 26 160 30" stroke="#6a8a40" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M165 22 Q170 18 175 22" stroke="#6a8a40" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- HUD -->
+    <div class="hud-bar">
+      <div class="hud-title">The Verdant Kingdom</div>
+      <div class="hud-stats">
+        <div class="stat-pill"><div class="stat-pip" style="background:#8aca40"></div><span id="bloomLbl">Bloom 60</span></div>
+        <div class="stat-pill"><div class="stat-pip" style="background:#5a9a60"></div><span id="rootLbl">Root 40</span></div>
+      </div>
+    </div>
+
+    <!-- Companion -->
+    <div class="companion-section">
+      <div class="speech-bubble">
+        <div class="speech-text" id="speechText">The forest called to me… and here you are.</div>
+      </div>
+
+      <div class="grove-wrap" id="groveWrap" onclick="petGrove()">
+        <svg width="115" height="145" viewBox="0 0 115 145" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Shadow -->
+          <ellipse cx="57" cy="138" rx="24" ry="5" fill="rgba(90,60,20,.15)"/>
+          <!-- Trunk / body -->
+          <rect x="52" y="96" width="10" height="42" rx="5" fill="#5a3e20"/>
+          <!-- Side roots for legs -->
+          <path d="M52 128 Q40 134 38 142" stroke="#5a3e20" stroke-width="7" stroke-linecap="round" fill="none"/>
+          <path d="M63 130 Q74 136 76 143" stroke="#5a3e20" stroke-width="7" stroke-linecap="round" fill="none"/>
+          <!-- Arms -->
+          <path d="M28 88 Q20 78 24 68" stroke="#5a3e20" stroke-width="7" stroke-linecap="round" fill="none"/>
+          <path d="M87 88 Q95 78 91 68" stroke="#5a3e20" stroke-width="7" stroke-linecap="round" fill="none"/>
+          <!-- Canopy body layers -->
+          <ellipse cx="57" cy="74" rx="40" ry="44" fill="#3a5e18"/>
+          <ellipse cx="57" cy="64" rx="32" ry="34" fill="#4a7824"/>
+          <ellipse cx="57" cy="54" rx="23" ry="25" fill="#5a9030"/>
+          <!-- Head -->
+          <ellipse cx="57" cy="46" rx="16" ry="17" fill="#6aaa38"/>
+          <!-- Top sprout -->
+          <path d="M57 29 C57 29 49 17 52 8 C55 0 59 5 57 13 C59 5 64 2 66 10 C68 18 57 29 57 29Z" fill="#7ac040"/>
+          <!-- Side leaf sprouts -->
+          <path d="M41 44 C41 44 28 42 24 32 C22 25 28 23 33 29 C28 24 33 18 39 26 C44 33 41 44 41 44Z" fill="#5a9830"/>
+          <path d="M73 44 C73 44 86 42 90 32 C92 25 86 23 81 29 C86 24 81 18 75 26 C70 33 73 44 73 44Z" fill="#5a9830"/>
+          <!-- Eyes white -->
+          <ellipse cx="48" cy="48" rx="8" ry="9" fill="#f0f8e8"/>
+          <ellipse cx="66" cy="48" rx="8" ry="9" fill="#f0f8e8"/>
+          <!-- Iris -->
+          <ellipse cx="48" cy="50" rx="5.5" ry="6" fill="#3a7818"/>
+          <ellipse cx="66" cy="50" rx="5.5" ry="6" fill="#3a7818"/>
+          <!-- Pupils -->
+          <circle cx="49" cy="50" r="3.5" fill="#1a2808"/>
+          <circle cx="67" cy="50" r="3.5" fill="#1a2808"/>
+          <!-- Eye shine -->
+          <circle cx="50.5" cy="49" r="1.3" fill="white"/>
+          <circle cx="68.5" cy="49" r="1.3" fill="white"/>
+          <!-- Nose -->
+          <ellipse cx="57" cy="58" rx="3.5" ry="2.2" fill="#3a5a18"/>
+          <!-- Mouth / smile -->
+          <path id="groveMouth" d="M49 65 Q57 72 65 65" stroke="#3a5a18" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+          <!-- Blush -->
+          <ellipse cx="37" cy="60" rx="6" ry="4" fill="rgba(120,200,60,.35)"/>
+          <ellipse cx="77" cy="60" rx="6" ry="4" fill="rgba(120,200,60,.35)"/>
+          <!-- Leaf spots -->
+          <circle cx="42" cy="40" r="2.5" fill="#9ad050" opacity=".55"/>
+          <circle cx="72" cy="36" r="2" fill="#8ac040" opacity=".5"/>
+          <circle cx="57" cy="34" r="1.8" fill="#aae060" opacity=".6"/>
+          <circle cx="27" cy="76" r="1.5" fill="#8ac040" opacity=".4"/>
+          <circle cx="87" cy="78" r="1.5" fill="#8ac040" opacity=".4"/>
+        </svg>
+      </div>
+
+      <div class="grove-name">Grove</div>
+      <div class="grove-bond" id="bondText">Seedling Bond</div>
+      <div class="bond-bar-wrap">
+        <div class="bond-bar-fill" id="bondFill" style="width:8%"></div>
+      </div>
+    </div>
+
+    <!-- Bottom panel -->
+    <div class="bottom-panel">
+      <div class="tabs-row">
+        <button class="tab-btn active" onclick="showTab('journey',this)">Journey</button>
+        <button class="tab-btn" onclick="showTab('duel',this)">Wit Duel</button>
+        <button class="tab-btn" onclick="showTab('whisper',this)">Whisper</button>
+      </div>
+
+      <!-- Journey tab -->
+      <div class="tab-pane active" id="tab-journey">
+        <div class="act-grid">
+          <button class="act-btn" onclick="doAction('explore')">
+            <span class="act-ico">🌿</span>
+            <span class="act-lbl">Explore</span>
+            <span class="act-sub">+Bloom +Bond</span>
+          </button>
+          <button class="act-btn" onclick="doAction('blight')">
+            <span class="act-ico">🛡️</span>
+            <span class="act-lbl">Face the Blight</span>
+            <span class="act-sub">+Root +Courage</span>
+          </button>
+          <button class="act-btn" onclick="doAction('rest')">
+            <span class="act-ico">🌙</span>
+            <span class="act-lbl">Rest Together</span>
+            <span class="act-sub">+Bloom +Root</span>
+          </button>
+          <button class="act-btn" onclick="doAction('memory')">
+            <span class="act-ico">🌱</span>
+            <span class="act-lbl">Plant a Memory</span>
+            <span class="act-sub">+Bond</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Wit Duel tab -->
+      <div class="tab-pane" id="tab-duel">
+        <div class="puzzle-scene" id="puzzleScene">Loading the forest's riddle…</div>
+        <div class="puzzle-choices" id="puzzleChoices"></div>
+        <div class="puzzle-result" id="puzzleResult"></div>
+        <button class="btn-secondary" id="nextPuzzleBtn" onclick="loadNextPuzzle()">Another riddle ›</button>
+      </div>
+
+      <!-- Whisper tab -->
+      <div class="tab-pane" id="tab-whisper">
+        <div class="whisper-log" id="whisperLog">
+          <div class="w-msg grove">Grove: I am always here — listening to the wind you carry with you.</div>
+        </div>
+        <div class="w-input-row">
+          <input class="w-input" id="whisperInput" placeholder="Whisper to Grove…" maxlength="140"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){sendWhisper();event.preventDefault()}"/>
+          <button class="w-send" onclick="sendWhisper()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ── STATE ────────────────────────────────────────────────────────────────
+var S = { bloom:60, root:40, bondXP:0, bondLevel:0, puzzleIdx:0, busy:false };
+
+var BOND_TIERS = [
+  {name:"Seedling Bond", xpNeeded:5},
+  {name:"Sprouting Trust", xpNeeded:10},
+  {name:"Deep Roots", xpNeeded:16},
+  {name:"Ancient Bond", xpNeeded:24},
+  {name:"One With the Forest", xpNeeded:9999}
+];
+
+// ── DIALOGUE ─────────────────────────────────────────────────────────────
+var D = {
+  pet:["…","Your hands are warm.","I feel everything you mean by that.","Stay close.","*a soft, contented sigh*"],
+  explore:["Lead on — I know the way.","The forest wants us to see this.","Stay close. And wonder freely.","Something beautiful is just ahead."],
+  blight:["I am your shield. Always.","We stand together. That is enough.","The dark knows our bond. It hesitates.","Whatever comes — we face it together."],
+  rest:["Rest. I will watch the stars.","You are safe here. Truly.","Even the forest sleeps sometimes.","Close your eyes. I am not going anywhere."],
+  memory:["This will grow long after us.","A memory is the most living thing.","The earth remembers kindness.","Roots and remembrance — they are the same."],
+  levelup:["Our roots reach deeper now.","I feel you more clearly than before.","The forest sings differently between us now.","Something ancient in me recognises you."]
+};
+
+var ACT_NARRATION = {
+  explore:["A hidden glade reveals itself — Grove knew it was there all along.","You follow Grove through a corridor of trees older than memory.","Grove finds a forgotten path and looks back at you, eyes bright.","The moss glows faintly beneath your feet as Grove leads the way."],
+  blight:["A shadow falls. Grove steps in front of you without hesitation.","The Blight whispers doubt. Grove whispers back: 'Not today.'","Together you hold the line. The darkness retreats, slowly.","Grove's roots dig deep. You feel something steady beneath your fear."],
+  rest:["The canopy breathes above you. Neither of you needs to speak.","Grove hums an old forest melody. You don't know it — but somehow you do.","Stars blink through the leaves. Grove points to one. 'Ours,' they say.","You fall asleep against Grove's warmth. The forest keeps watch."],
+  memory:["You press a small stone into the earth. Grove marks the spot with a bloom.","Grove weaves a tiny ring of grass and places it in your palm.","The soil accepts your offering. Something stirs beneath, quietly grateful.","A memory planted here will outlast both of you. Grove seems to understand."]
+};
+
+// ── PUZZLES ───────────────────────────────────────────────────────────────
+var PUZZLES = [
+  {
+    scene:"The Withering Hollow: An elder speaks only in riddles, guarding a bridge the Blight has touched. She says — 'I grow without being fed, I stand without legs, I fall without dying. What am I?'",
+    choices:["A river","A tree","A shadow","A year"],
+    correct:1,
+    win:"The elder smiles and steps aside. Grove gives your hand a quiet squeeze.",
+    lose:"She shakes her head. Grove whispers: 'Think of what has roots.' Try again."
+  },
+  {
+    scene:"The Tangled Court: A young knight blocks your path, grieving but proud. He asks — 'What can be broken without being touched, and healed without medicine?'",
+    choices:["A bone","A promise","A heart","A mirror"],
+    correct:2,
+    win:"The knight lowers his sword. Something in his face unknots. Grove nods gently.",
+    lose:"He frowns, but doesn't move. Grove says softly: 'What do you carry right now?' Try again."
+  },
+  {
+    scene:"The Spore Marsh: A fungal spirit bars the path. She speaks in whispers — 'The more you take from me, the more I leave behind. What am I?'",
+    choices:["A river","The wind","A footprint","A flame"],
+    correct:2,
+    win:"The spirit dissolves into soft spores, laughing. Grove looks quietly proud of you.",
+    lose:"She drifts back, patient. Grove says: 'Think of what you leave, not what you take.' Try again."
+  },
+  {
+    scene:"The Hollow King's Gate: A carved door asks one last thing — 'I have cities but no houses live in them. Mountains but no trees grow there. Water but no fish swim in it. What am I?'",
+    choices:["A dream","A map","A reflection","A cloud"],
+    correct:1,
+    win:"The gate opens with a sound like deep roots stretching. Grove exhales. 'You did it.'",
+    lose:"The door hums in refusal. Grove murmurs: 'What shows a world without being one?' Try again."
+  },
+  {
+    scene:"The Seedling Parliament: Three quarrelling creatures each claim they gave the most to the forest. Grove asks you — 'What feeds everything and yet is never seen eating?'",
+    choices:["Sunlight","The soil","Rain","Silence"],
+    correct:1,
+    win:"The creatures fall quiet. Then they begin to listen to each other. Grove smiles warmly.",
+    lose:"Grove tilts their head. 'What holds the roots themselves?' Try again."
+  }
+];
+
+var GROVE_REPLIES = [
+  "The roots feel your words. I feel them too.",
+  "You are heard. Fully.",
+  "Keep going. I am not going anywhere.",
+  "That matters. You matter.",
+  "The forest holds what you share here.",
+  "I am glad you told me.",
+  "Whatever it is — it belongs here with us.",
+  "You are braver than you know, just for saying it.",
+  "Grove sits with you quietly for a moment, and glows softly.",
+  "This is a safe place. You are a safe person.",
+  "Every word you share here becomes part of the forest's memory."
+];
+
+// ── UTILS ─────────────────────────────────────────────────────────────────
+function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); },1800);
+}
+
+function setSpeech(text){
+  var el=document.getElementById('speechText');
+  el.style.opacity='0';
+  setTimeout(function(){ el.textContent=text; el.style.opacity='1'; },200);
+}
+
+function animGrove(type){
+  var el=document.getElementById('groveWrap');
+  el.classList.remove('anim-bounce','anim-shake');
+  void el.offsetWidth;
+  el.classList.add('anim-'+type);
+  setTimeout(function(){ el.classList.remove('anim-bounce','anim-shake'); },600);
+}
+
+function updateStats(){
+  S.bloom = Math.min(100, Math.max(0, S.bloom));
+  S.root  = Math.min(100, Math.max(0, S.root));
+  document.getElementById('bloomLbl').textContent='Bloom '+S.bloom;
+  document.getElementById('rootLbl').textContent='Root '+S.root;
+  var tier = BOND_TIERS[Math.min(S.bondLevel, 4)];
+  document.getElementById('bondText').textContent = tier.name;
+  var pct = S.bondLevel>=4 ? 100 : Math.round(S.bondXP/tier.xpNeeded*100);
+  document.getElementById('bondFill').style.width = pct+'%';
+}
+
+function addBond(n){
+  S.bondXP += n;
+  var tier = BOND_TIERS[Math.min(S.bondLevel,4)];
+  if(S.bondLevel<4 && S.bondXP >= tier.xpNeeded){
+    S.bondLevel++;
+    S.bondXP=0;
+    animGrove('bounce');
+    setSpeech(rand(D.levelup));
+    showToast('Bond deepened — '+BOND_TIERS[S.bondLevel].name+'!');
+  }
+  updateStats();
+}
+
+// ── ACTIONS ───────────────────────────────────────────────────────────────
+function petGrove(){
+  animGrove('bounce');
+  setSpeech(rand(D.pet));
+  S.bloom+=3; addBond(.4);
+  showToast('+Bloom');
+}
+
+function doAction(type){
+  animGrove(type==='blight'?'shake':'bounce');
+  setSpeech(rand(D[type]));
+  if(type==='explore'){ S.bloom+=8; addBond(1); showToast('+Bloom +Bond'); }
+  else if(type==='blight'){ S.root+=10; S.bloom+=4; addBond(1.2); showToast('+Root'); }
+  else if(type==='rest'){ S.bloom+=7; S.root+=6; addBond(.8); showToast('+Bloom +Root'); }
+  else if(type==='memory'){ addBond(2); showToast('+Bond'); }
+  updateStats();
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────
+function showTab(id,btn){
+  document.querySelectorAll('.tab-pane').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='duel') loadPuzzle();
+}
+
+// ── WIT DUEL ──────────────────────────────────────────────────────────────
+function loadPuzzle(){
+  var p = PUZZLES[S.puzzleIdx % PUZZLES.length];
+  document.getElementById('puzzleScene').textContent = p.scene;
+  document.getElementById('puzzleResult').textContent='';
+  document.getElementById('nextPuzzleBtn').style.display='none';
+  var ch=document.getElementById('puzzleChoices');
+  ch.innerHTML = p.choices.map(function(c,i){
+    return '<button class="p-choice" onclick="choosePuzzle('+i+')">'+c+'</button>';
+  }).join('');
+}
+
+function choosePuzzle(i){
+  var p = PUZZLES[S.puzzleIdx % PUZZLES.length];
+  document.querySelectorAll('.p-choice').forEach(function(b,idx){
+    if(idx===p.correct) b.classList.add('correct');
+    else if(idx===i && i!==p.correct) b.classList.add('wrong');
+    b.disabled=true;
+  });
+  var correct = i===p.correct;
+  document.getElementById('puzzleResult').textContent = correct ? p.win : p.lose;
+  if(correct){
+    S.bloom+=10; S.root+=8; addBond(1.5);
+    animGrove('bounce');
+    setSpeech("Your mind and my roots — unstoppable.");
+    showToast('+Bloom +Root +Bond');
+    document.getElementById('nextPuzzleBtn').style.display='block';
+    S.puzzleIdx++;
+  } else {
+    animGrove('shake');
+    setSpeech("Try again. I believe in you.");
+  }
+}
+
+function loadNextPuzzle(){ loadPuzzle(); }
+
+// ── WHISPER ───────────────────────────────────────────────────────────────
+function sendWhisper(){
+  if(S.busy) return;
+  var inp=document.getElementById('whisperInput');
+  var msg=inp.value.trim();
+  if(!msg) return;
+  var log=document.getElementById('whisperLog');
+  var you=document.createElement('div');
+  you.className='w-msg you';
+  you.textContent='You: '+msg;
+  log.appendChild(you);
+  inp.value=''; log.scrollTop=log.scrollHeight;
+  S.busy=true; S.bloom+=3; addBond(.8); showToast('+Bond');
+  setTimeout(function(){
+    var r=document.createElement('div');
+    r.className='w-msg grove';
+    r.textContent='Grove: '+rand(GROVE_REPLIES);
+    log.appendChild(r);
+    log.scrollTop=log.scrollHeight;
+    animGrove('bounce');
+    setSpeech("Grove listens. With everything.");
+    S.busy=false;
+  }, 800+Math.random()*500);
+}
+
+// ── START GAME ────────────────────────────────────────────────────────────
+function startGame(){
+  document.getElementById('screen-title').classList.remove('active');
+  document.getElementById('screen-game').classList.add('active');
+  var splash=document.getElementById('chapterSplash');
+  splash.classList.add('show');
+  setTimeout(function(){
+    splash.style.opacity='0';
+    setTimeout(function(){ splash.style.display='none'; },600);
+  },2800);
+  updateStats();
+  loadPuzzle();
+}
+
+updateStats();
+</script>
+</body>
+</html>
