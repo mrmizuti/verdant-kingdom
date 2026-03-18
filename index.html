@@ -210,17 +210,17 @@ html,body{height:100%;width:100%;overflow:hidden;background:#2a5010;font-family:
 
 .nav-tile-ico{
   display:flex;align-items:center;justify-content:center;
-  width:85%;aspect-ratio:1;
-  font-size:clamp(22px, 7vw, 30px);
+  width:90%;aspect-ratio:1;
+  font-size:clamp(28px, 9.5vw, 40px);
   line-height:1;
-  margin-bottom:6px;
+  margin-bottom:8px;
 }
 .nav-tile-ico svg{ width:100%;height:100%; }
 
-/* Active icon floats upward, overextends above the bar */
+/* Active icon only moves up — tile height does NOT change */
 .nav-tile.active-tile .nav-tile-ico{
-  margin-bottom:6px;
-  transform:translateY(-18px);
+  margin-bottom:8px;
+  transform:translateY(-22px);
 }
 
 /* ═══════════════════════════════════════
@@ -600,28 +600,161 @@ html,body{height:100%;width:100%;overflow:hidden;background:#2a5010;font-family:
     </svg>
   </div>
 
-  <!-- Big action button -->
-  <div class="action-btn-wrap">
-    <div class="action-btn" onclick="navTo('explore')">
-      <div class="action-btn-top"></div>
-      <div class="action-btn-title">Go Explore!</div>
-      <div class="action-btn-sub">⚡ Adventures await</div>
-    </div>
-  </div>
-
-  <!-- Bottom nav — 5 tiles, no gap, no background, center is active gold -->
+  <!-- Bottom nav — 5 tiles -->
   <div class="bottom-nav" id="bottomNav">
-    <div class="nav-tile"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🏕️</span></div></div>
-    <div class="nav-tile"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🎒</span></div></div>
-    <div class="nav-tile active-tile"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">⚔️</span></div></div>
-    <div class="nav-tile"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🧭</span></div></div>
-    <div class="nav-tile"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">⚙️</span></div></div>
+    <div class="nav-tile active-tile" onclick="navTo('camp')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🏕️</span></div></div>
+    <div class="nav-tile" onclick="navTo('pack')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🎒</span></div></div>
+    <div class="nav-tile" onclick="navTo('battle-hub')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">⚔️</span></div></div>
+    <div class="nav-tile" onclick="navTo('explore')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🧭</span></div></div>
+    <div class="nav-tile" onclick="navTo('settings')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">⚙️</span></div></div>
   </div>
 
 
 <!-- ═══════════════════════════════════════
-     EXPLORE SCREEN
+     CAMP SCREEN (🏕️)
 ═══════════════════════════════════════ -->
+<div class="screen" id="screen-camp">
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,#1a3a0a 0%,#0d1e06 100%);z-index:0;"></div>
+  <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:0 24px calc(var(--safe-bottom)+90px);gap:20px;">
+    <div style="font-size:64px;line-height:1;">🏕️</div>
+    <div style="font-family:'Nunito',sans-serif;font-size:26px;font-weight:900;color:#d8f0a8;text-align:center;letter-spacing:.04em;">Camp</div>
+    <div style="font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:rgba(200,240,160,.6);text-align:center;max-width:260px;line-height:1.65;">A warm fire, a safe place to rest. Cook meals, craft items, and prepare for the road ahead.</div>
+    <div style="width:100%;max-width:320px;background:rgba(255,255,255,.06);border:2.5px solid #2a1a08;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;align-items:center;gap:14px;padding:12px;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:12px;">
+        <span style="font-size:28px;">🍲</span>
+        <div><div style="font-size:14px;font-weight:900;color:white;">Cook a Meal</div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;">Coming soon</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;padding:12px;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:12px;">
+        <span style="font-size:28px;">🛠️</span>
+        <div><div style="font-size:14px;font-weight:900;color:white;">Craft Items</div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;">Coming soon</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;padding:12px;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);border-radius:12px;">
+        <span style="font-size:28px;">💤</span>
+        <div><div style="font-size:14px;font-weight:900;color:white;">Rest &amp; Recover</div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;">Coming soon</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-tile active-tile" onclick="navTo('camp')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🏕️</span></div></div>
+    <div class="nav-tile" onclick="navTo('pack')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🎒</span></div></div>
+    <div class="nav-tile" onclick="navTo('battle-hub')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">⚔️</span></div></div>
+    <div class="nav-tile" onclick="navTo('explore')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🧭</span></div></div>
+    <div class="nav-tile" onclick="navTo('settings')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">⚙️</span></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PACK SCREEN (🎒)
+═══════════════════════════════════════ -->
+<div class="screen" id="screen-pack">
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,#3a2010 0%,#1e0e06 100%);z-index:0;"></div>
+  <div style="position:relative;z-index:2;display:flex;flex-direction:column;height:100%;padding:calc(var(--safe-top)+16px) 16px calc(var(--safe-bottom)+90px);">
+    <div style="font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:#f5e0a0;margin-bottom:16px;text-align:center;letter-spacing:.04em;">🎒 Backpack</div>
+    <!-- Water drops currency -->
+    <div style="display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.3);border:2px solid rgba(74,184,216,.35);border-radius:99px;padding:6px 16px;align-self:center;margin-bottom:18px;">
+      <svg width="14" height="18" viewBox="0 0 16 20" fill="none"><path d="M8 1 Q14 8 14 12 A6 6 0 0 1 2 12 Q2 8 8 1Z" fill="#4ab8d8"/></svg>
+      <span style="font-size:14px;font-weight:900;color:#90d8f0;" id="packWaterLbl">0</span>
+      <span style="font-size:11px;font-weight:700;color:rgba(144,216,240,.6);">Water Drops</span>
+    </div>
+    <!-- Grid of items -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex:1;align-content:start;">
+      <div style="aspect-ratio:1;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.12);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;">🌿</div>
+      <div style="aspect-ratio:1;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.12);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;">💧</div>
+      <div style="aspect-ratio:1;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.12);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:28px;">🍄</div>
+      <div style="aspect-ratio:1;background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:rgba(255,255,255,.2);">+</div>
+      <div style="aspect-ratio:1;background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.15);border-radius:12px;"></div>
+      <div style="aspect-ratio:1;background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.15);border-radius:12px;"></div>
+      <div style="aspect-ratio:1;background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.15);border-radius:12px;"></div>
+      <div style="aspect-ratio:1;background:rgba(255,255,255,.04);border:2px dashed rgba(255,255,255,.15);border-radius:12px;"></div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.3);text-align:center;margin-top:14px;">More items earned through exploring &amp; battles</div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-tile" onclick="navTo('camp')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🏕️</span></div></div>
+    <div class="nav-tile active-tile" onclick="navTo('pack')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🎒</span></div></div>
+    <div class="nav-tile" onclick="navTo('battle-hub')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">⚔️</span></div></div>
+    <div class="nav-tile" onclick="navTo('explore')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🧭</span></div></div>
+    <div class="nav-tile" onclick="navTo('settings')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">⚙️</span></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     BATTLE HUB SCREEN (⚔️)
+═══════════════════════════════════════ -->
+<div class="screen" id="screen-battle-hub">
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,#1a0a30 0%,#0a0516 100%);z-index:0;"></div>
+  <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:0 24px calc(var(--safe-bottom)+90px);gap:20px;">
+    <div style="font-size:64px;line-height:1;">⚔️</div>
+    <div style="font-family:'Nunito',sans-serif;font-size:26px;font-weight:900;color:#e0c8ff;text-align:center;letter-spacing:.04em;">Battle</div>
+    <div style="font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:rgba(200,160,255,.6);text-align:center;max-width:260px;line-height:1.65;">Face tainted companions and heal them with Grove's help.</div>
+    <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:10px;">
+      <div class="exp-row-btn" style="background:rgba(255,255,255,.06);border:2.5px solid #2a1a08;border-radius:16px;padding:18px 20px;" onclick="startBattle()">
+        <div class="exp-row-ico gold">⚔️</div>
+        <div class="exp-row-text">
+          <div class="exp-row-title" style="color:white;">Random Battle</div>
+          <div class="exp-row-sub">Face a tainted companion — heal them!</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;padding:18px 20px;background:rgba(255,255,255,.04);border:2.5px solid rgba(255,255,255,.1);border-radius:16px;">
+        <div style="width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:22px;">🗺️</div>
+        <div><div style="font-size:15px;font-weight:900;color:white;">Story Mode</div><div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:2px;">Coming soon</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-tile" onclick="navTo('camp')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🏕️</span></div></div>
+    <div class="nav-tile" onclick="navTo('pack')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🎒</span></div></div>
+    <div class="nav-tile active-tile" onclick="navTo('battle-hub')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">⚔️</span></div></div>
+    <div class="nav-tile" onclick="navTo('explore')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🧭</span></div></div>
+    <div class="nav-tile" onclick="navTo('settings')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">⚙️</span></div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     EXPLORE SCREEN (🧭) — replaces old explore
+═══════════════════════════════════════ -->
+<!-- (already exists as screen-explore, we'll restyle it via navTo) -->
+
+<!-- ═══════════════════════════════════════
+     SETTINGS SCREEN (⚙️)
+═══════════════════════════════════════ -->
+<div class="screen" id="screen-settings">
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,#1e2a10 0%,#0e1606 100%);z-index:0;"></div>
+  <div style="position:relative;z-index:2;display:flex;flex-direction:column;height:100%;padding:calc(var(--safe-top)+16px) 16px calc(var(--safe-bottom)+90px);">
+    <div style="font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;color:#d8f0a8;margin-bottom:20px;text-align:center;letter-spacing:.04em;">⚙️ Settings</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.1);border-radius:14px;">
+        <div style="font-size:14px;font-weight:800;color:white;">🔊 Sound Effects</div>
+        <div style="width:44px;height:24px;background:#5aaa28;border:2px solid #2a1a08;border-radius:99px;position:relative;cursor:pointer;"><div style="width:18px;height:18px;background:white;border:1.5px solid #2a1a08;border-radius:50%;position:absolute;right:2px;top:1px;"></div></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.1);border-radius:14px;">
+        <div style="font-size:14px;font-weight:800;color:white;">🎵 Music</div>
+        <div style="width:44px;height:24px;background:#5aaa28;border:2px solid #2a1a08;border-radius:99px;position:relative;cursor:pointer;"><div style="width:18px;height:18px;background:white;border:1.5px solid #2a1a08;border-radius:50%;position:absolute;right:2px;top:1px;"></div></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.1);border-radius:14px;">
+        <div style="font-size:14px;font-weight:800;color:white;">📳 Vibration</div>
+        <div style="width:44px;height:24px;background:#6a4228;border:2px solid #2a1a08;border-radius:99px;position:relative;cursor:pointer;"><div style="width:18px;height:18px;background:white;border:1.5px solid #2a1a08;border-radius:50%;position:absolute;left:2px;top:1px;"></div></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.1);border-radius:14px;">
+        <div style="font-size:14px;font-weight:800;color:white;">🌐 Language</div>
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.5);">English ›</div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.1);border-radius:14px;">
+        <div style="font-size:14px;font-weight:800;color:white;">ℹ️ Version</div>
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,.5);">v1.0.0</div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-tile" onclick="navTo('camp')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🏕️</span></div></div>
+    <div class="nav-tile" onclick="navTo('pack')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🎒</span></div></div>
+    <div class="nav-tile" onclick="navTo('battle-hub')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">⚔️</span></div></div>
+    <div class="nav-tile" onclick="navTo('explore')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🧭</span></div></div>
+    <div class="nav-tile active-tile" onclick="navTo('settings')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">⚙️</span></div></div>
+  </div>
+</div>
+
+
 <div class="screen" id="screen-explore">
   <div class="exp-scene">
     <svg viewBox="0 0 430 780" preserveAspectRatio="xMidYMid slice">
@@ -654,11 +787,11 @@ html,body{height:100%;width:100%;overflow:hidden;background:#2a5010;font-family:
     </div>
   </div>
   <div class="bottom-nav" id="bottomNavExplore">
-    <div class="nav-tile"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🏕️</span></div></div>
-    <div class="nav-tile"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🎒</span></div></div>
-    <div class="nav-tile active-tile"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">⚔️</span></div></div>
-    <div class="nav-tile"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🧭</span></div></div>
-    <div class="nav-tile"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">⚙️</span></div></div>
+    <div class="nav-tile" onclick="navTo('camp')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🏕️</span></div></div>
+    <div class="nav-tile" onclick="navTo('pack')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🎒</span></div></div>
+    <div class="nav-tile" onclick="navTo('battle-hub')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">⚔️</span></div></div>
+    <div class="nav-tile active-tile" onclick="navTo('explore')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">🧭</span></div></div>
+    <div class="nav-tile" onclick="navTo('settings')"><div class="nav-tile-ico"><span style="font-size:85%;line-height:1;display:block;">⚙️</span></div></div>
   </div>
 </div>
 
@@ -824,13 +957,15 @@ function spawnMotes(){
 }
 
 function navTo(id){
-  if(id==='backpack'||id==='settings'){toast('Coming soon!');return;}
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
-  document.querySelectorAll('.nav-tile').forEach(function(b){b.classList.remove('on');});
-  document.getElementById('screen-'+id).classList.add('active');
-  var nb=document.getElementById('nb-'+id);if(nb)nb.classList.add('on');
-  var nb2=document.getElementById('nb2-'+id);if(nb2)nb2.classList.add('on');
-  cur=id;
+  var el = document.getElementById('screen-'+id);
+  if(el){ el.classList.add('active'); }
+  cur = id;
+  // update pack water label if navigating there
+  if(id==='pack'){
+    var pw = document.getElementById('packWaterLbl');
+    if(pw) pw.textContent = G.water;
+  }
 }
 
 // ── ENEMIES ───────────────────────────────────────────────────────────────
@@ -972,7 +1107,7 @@ function doAction(type){
   B.busy=true;setMenuEnabled(false);
   if(type==='retreat'){
     setLog('Grove retreats gracefully. "We\'ll try again."');
-    setTimeout(function(){navTo('explore');},1500);return;
+    setTimeout(function(){navTo('battle-hub');},1500);return;
   }
   if(type==='attack'){
     var dmg=randInt(10,22);B.eHp-=dmg;
@@ -1010,7 +1145,7 @@ function doAction(type){
         animEl('enemySprite','hit');
         setTimeout(function(){
           spawnFloater('-'+ed,'dmg','playerSprite');updateBattleBars();
-          if(B.pHp<=0){setLog('Grove collapses... "It\'s okay. We\'ll come back."');setTimeout(function(){navTo('explore');},2200);return;}
+          if(B.pHp<=0){setLog('Grove collapses... "It\'s okay. We\'ll come back."');setTimeout(function(){navTo('battle-hub');},2200);return;}
           B.busy=false;setMenuEnabled(true);
         },300);
       },700);
@@ -1027,7 +1162,7 @@ function showVictory(){
   document.getElementById('wdGain').textContent='+'+wd;
   document.getElementById('victoryWrap').classList.add('show');
 }
-function endBattle(){document.getElementById('victoryWrap').classList.remove('show');navTo('explore');}
+function endBattle(){document.getElementById('victoryWrap').classList.remove('show');navTo('battle-hub');}
 
 spawnMotes();
 updateWater();
