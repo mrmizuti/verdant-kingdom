@@ -92,20 +92,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a3408;font-family:
 .h-bar-hp{background:linear-gradient(90deg,#b02020,#e84040);}
 .h-bar-en{background:linear-gradient(90deg,#b08010,#e8c030);}
 
-/* Floating nav card — does NOT touch sides or bottom, sits above global nav */
-.home-card{
-  position:absolute;
-  bottom:calc(14px + var(--safe-bottom) + 76px);
-  left:50%;transform:translateX(-50%);
-  width:90%;max-width:400px;
-  background:rgba(12,28,5,.82);
-  border:1.5px solid rgba(140,200,80,.38);
-  border-radius:24px;
-  padding:14px 16px;
-  backdrop-filter:blur(12px);
-  pointer-events:none;
-  box-shadow:0 8px 32px rgba(0,0,0,.35);
-}
+/* (home-card removed) */
 
 /* Home card nav buttons grid */
 .home-card-nav{
@@ -278,7 +265,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a3408;font-family:
   z-index:200;
   background:rgba(12,28,5,.88);
   border:1.5px solid rgba(140,200,80,.42);
-  border-radius:26px;
+  border-radius:10px;
   padding:8px 10px;
   backdrop-filter:blur(14px);
   box-shadow:0 8px 32px rgba(0,0,0,.45);
@@ -290,7 +277,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a3408;font-family:
   gap:3px;padding:8px 4px 7px;
   background:none;border:none;cursor:pointer;
   -webkit-tap-highlight-color:transparent;
-  transition:all .15s;border-radius:18px;
+  transition:all .15s;border-radius:8px;
 }
 .nb:active{transform:scale(.88);background:rgba(140,200,80,.1);}
 .nb.on{background:rgba(140,200,80,.14);}
@@ -482,8 +469,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a3408;font-family:
       </div>
     </div>
 
-    <!-- Floating info card (bars only — nav is global) -->
-    <div class="home-card" id="homeCard"></div>
+
   </div>
 </div>
 
