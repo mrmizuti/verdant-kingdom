@@ -6,1198 +6,1087 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Verdant Kingdom">
-<meta name="theme-color" content="#2a4a10">
+<meta name="theme-color" content="#4a8a28">
 <title>The Verdant Kingdom</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
   --safe-top:env(safe-area-inset-top,0px);
-  --safe-bottom:env(safe-area-inset-bottom,16px);
+  --safe-bottom:env(safe-area-inset-bottom,12px);
+  --outline:#2a1a08;
+  --panel-bg:#7a4a28;
+  --panel-top:#9a6038;
+  --panel-shadow:#4a2a10;
+  --gold:#f5c842;
+  --gold-shadow:#c89010;
+  --gold-top:#fde878;
+  --btn-green:#5aaa28;
+  --btn-green-shadow:#2a6010;
+  --btn-blue:#3888d8;
+  --btn-blue-shadow:#1a5090;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;width:100%;overflow:hidden;background:#1a3408;font-family:'Nunito',sans-serif;}
-#app{position:fixed;inset:0;display:flex;flex-direction:column;max-width:430px;margin:0 auto;overflow:hidden;}
-.screen{display:none;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
+html,body{height:100%;width:100%;overflow:hidden;background:#2a5010;font-family:'Nunito',sans-serif;}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;max-width:430px;margin:0 auto;overflow:hidden;background:#2a5010;}
+.screen{display:none;flex-direction:column;height:100%;overflow:hidden;position:relative;}
 .screen.active{display:flex;}
 
-/* ══════════════════════════════
-   HOME SCREEN
-══════════════════════════════ */
-#screen-home{position:relative;background:#1c3a08;}
+/* ═══════════════════════════════════════
+   SHARED CHUNKY BUTTON STYLE
+═══════════════════════════════════════ */
+.chunky-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  border:3px solid var(--outline);
+  border-radius:14px;
+  cursor:pointer;
+  position:relative;
+  transition:transform .1s;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+.chunky-btn:active{transform:translateY(3px);}
+.chunky-btn::after{
+  content:'';position:absolute;
+  bottom:-5px;left:2px;right:2px;height:5px;
+  background:var(--btn-shadow,#333);
+  border-radius:0 0 10px 10px;
+  border:3px solid var(--outline);
+  border-top:none;
+  z-index:-1;
+}
 
-.home-scene{position:absolute;inset:0;z-index:0;}
-.home-scene svg{width:100%;height:100%;display:block;}
+/* ═══════════════════════════════════════
+   HOME SCREEN
+═══════════════════════════════════════ */
+#screen-home{background:#5ab8e8;}
+
+.world-bg{position:absolute;inset:0;z-index:0;overflow:hidden;}
+.world-bg svg{width:100%;height:100%;display:block;}
 
 #motesContainer{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;}
-.mote{position:absolute;border-radius:50%;background:#c8f07a;pointer-events:none;animation:mote-rise linear infinite;}
-@keyframes mote-rise{0%{opacity:0;transform:translateY(0)}25%{opacity:.7}80%{opacity:.3}100%{opacity:0;transform:translateY(-80px)}}
+.mote{position:absolute;border-radius:50%;background:#ffe87a;pointer-events:none;animation:mote-rise linear infinite;}
+@keyframes mote-rise{0%{opacity:0;transform:translateY(0)}25%{opacity:.8}80%{opacity:.4}100%{opacity:0;transform:translateY(-70px)}}
 
-.home-ui{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;pointer-events:none;}
-
-/* Grove — 3x size, fills upper portion of screen */
-.grove-center{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  padding-top:20px;padding-bottom:0;
-  pointer-events:all;
-}
-.grove-svg-wrap{
-  cursor:pointer;
-  animation:g-float 4s ease-in-out infinite;
-  filter:drop-shadow(0 18px 40px rgba(20,80,10,.65));
-}
-@keyframes g-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
-.grove-svg-wrap.pop{animation:g-pop .5s ease forwards;}
-@keyframes g-pop{
-  0%{transform:translateY(0) scale(1)}
-  30%{transform:translateY(-22px) scale(1.08)}
-  65%{transform:translateY(3px) scale(.97)}
-  85%{transform:translateY(-6px) scale(1.02)}
-  100%{transform:translateY(0) scale(1)}
-}
-
-/* Heart floater */
-.heart-floater{
-  position:absolute;
-  font-size:30px;pointer-events:none;z-index:30;
-  animation:heart-rise 1s ease forwards;
-}
-@keyframes heart-rise{
-  0%{opacity:1;transform:translateY(0) scale(1)}
-  60%{opacity:.8;transform:translateY(-60px) scale(1.25)}
-  100%{opacity:0;transform:translateY(-110px) scale(.6)}
-}
-
-/* Horizontal bars — centred, above the nav card */
-.h-bars{
-  position:absolute;
-  bottom:calc(14px + var(--safe-bottom) + 76px + 20px);
-  left:50%;transform:translateX(-50%);
-  width:calc(100% - 80px);max-width:280px;
-  display:flex;flex-direction:column;gap:7px;
+/* TOP HUD */
+.top-hud{
+  position:absolute;top:calc(var(--safe-top)+8px);left:0;right:0;
+  z-index:20;display:flex;align-items:center;
+  justify-content:space-between;padding:0 10px;gap:8px;
   pointer-events:none;
 }
-.h-bar-row{display:flex;align-items:center;gap:8px;}
-.h-bar-ico{font-size:14px;flex-shrink:0;width:18px;text-align:center;}
-.h-bar-track{
-  flex:1;height:9px;
-  background:rgba(0,0,0,.38);
-  border-radius:99px;overflow:hidden;
-  border:1px solid rgba(255,255,255,.12);
+
+/* Player card top-left */
+.player-card{
+  background:var(--panel-bg);
+  border:3px solid var(--outline);
+  border-radius:14px;
+  display:flex;align-items:center;gap:8px;
+  padding:6px 10px 6px 6px;
+  box-shadow:0 4px 0 var(--panel-shadow);
+  pointer-events:all;
+  min-width:130px;
 }
-.h-bar-fill{height:100%;border-radius:99px;transition:width .7s ease;}
-.h-bar-hp{background:linear-gradient(90deg,#b02020,#e84040);}
-.h-bar-en{background:linear-gradient(90deg,#b08010,#e8c030);}
-
-/* (home-card removed) */
-
-/* Home card nav buttons grid */
-.home-card-nav{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  gap:6px;
+.player-avatar{
+  width:42px;height:42px;border-radius:10px;
+  border:2.5px solid var(--outline);
+  background:#4a8028;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;flex-shrink:0;
 }
-.hc-btn{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:4px;padding:10px 4px;
-  background:rgba(255,255,255,.06);
-  border:1.5px solid rgba(140,200,80,.2);
-  border-radius:16px;
-  cursor:pointer;
-  transition:all .15s;
-  -webkit-tap-highlight-color:transparent;
+.player-info-col{display:flex;flex-direction:column;gap:3px;}
+.player-level{font-size:10px;font-weight:900;color:#f5e0a0;letter-spacing:.03em;}
+.player-name-lbl{font-size:13px;font-weight:900;color:white;line-height:1;}
+.hp-bar-wrap{display:flex;flex-direction:column;gap:2px;}
+.hp-bar-track{width:78px;height:6px;background:rgba(0,0,0,.4);border-radius:99px;overflow:hidden;border:1.5px solid rgba(0,0,0,.3);}
+.hp-bar-fill{height:100%;background:linear-gradient(90deg,#e83030,#f86060);border-radius:99px;transition:width .6s ease;}
+.en-bar-fill{background:linear-gradient(90deg,#c8a010,#f8d040);}
+.hp-bar-lbl{font-size:9px;font-weight:900;color:#f5c070;line-height:1;}
+
+/* Resource pills top-right */
+.resource-pills{display:flex;align-items:center;gap:6px;}
+.res-pill{
+  background:rgba(20,10,5,.55);
+  border:2.5px solid var(--outline);
+  border-radius:99px;
+  display:flex;align-items:center;gap:5px;
+  padding:4px 10px 4px 6px;
+  box-shadow:0 3px 0 rgba(0,0,0,.4);
 }
-.hc-btn:active{transform:scale(.92);background:rgba(140,200,80,.14);}
-.hc-btn.on{border-color:rgba(140,200,80,.55);background:rgba(140,200,80,.12);}
-.hc-btn-ico{width:30px;height:30px;}
-.hc-btn-ico svg{width:30px;height:30px;}
-.hc-btn-lbl{font-size:9px;font-weight:900;color:#7aaa48;letter-spacing:.05em;text-transform:uppercase;}
-.hc-btn.on .hc-btn-lbl{color:#c8f060;}
+.res-ico{font-size:16px;line-height:1;}
+.res-val{font-size:12px;font-weight:900;color:white;}
+.res-dot{width:8px;height:8px;border-radius:50%;background:#e83030;border:1.5px solid var(--outline);margin-left:2px;}
 
-.toast{position:absolute;top:52px;left:50%;transform:translateX(-50%) translateY(-6px);background:rgba(6,14,3,.92);color:#c8f07a;border-radius:99px;padding:6px 18px;font-size:11px;font-weight:800;letter-spacing:.06em;z-index:20;opacity:0;pointer-events:none;transition:all .25s;white-space:nowrap;}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-/* ══════════════════════════════
-   EXPLORE SCREEN (hub)
-══════════════════════════════ */
-#screen-explore{background:#0e2004;position:relative;overflow:hidden;}
-.exp-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,#2a5010 0%,#080e04 80%);}
-.exp-wrap{position:relative;z-index:2;display:flex;flex-direction:column;height:100%;padding:calc(var(--safe-top)+20px) 24px 20px;gap:0;align-items:center;justify-content:center;}
-.exp-heading{font-family:'Spectral',serif;font-size:28px;font-weight:600;color:#d4eca0;text-align:center;margin-bottom:8px;letter-spacing:.04em;}
-.exp-sub{font-family:'Spectral',serif;font-style:italic;font-size:14px;color:#7aaa48;text-align:center;margin-bottom:48px;line-height:1.6;}
-.exp-btns{display:flex;flex-direction:column;gap:14px;width:100%;max-width:280px;}
-.exp-btn{
-  background:rgba(255,255,255,.06);
-  border:1.5px solid rgba(140,200,80,.3);
-  border-radius:18px;padding:20px 24px;
-  display:flex;align-items:center;gap:16px;
-  cursor:pointer;transition:all .2s;
-  -webkit-tap-highlight-color:transparent;
-}
-.exp-btn:active{transform:scale(.97);background:rgba(140,200,80,.12);}
-.exp-btn-ico{font-size:32px;flex-shrink:0;}
-.exp-btn-text{}
-.exp-btn-title{font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;color:#c8e890;margin-bottom:3px;}
-.exp-btn-sub{font-family:'Spectral',serif;font-style:italic;font-size:12px;color:#6a9040;line-height:1.4;}
-
-/* ══════════════════════════════
-   BATTLE SCREEN
-══════════════════════════════ */
-#screen-battle{background:#0a1a04;position:relative;overflow:hidden;}
-
-.battle-bg{position:absolute;inset:0;z-index:0;}
-.battle-bg svg{width:100%;height:100%;display:block;}
-
-.battle-ui{position:relative;z-index:2;display:flex;flex-direction:column;height:100%;}
-
-/* Top section: enemy + player */
-.battle-field{flex:1;display:flex;flex-direction:column;min-height:0;padding:calc(var(--safe-top)+8px) 16px 0;}
-
-/* Combatants row — player left, enemy right */
-.combatants-row{
-  flex:1;display:flex;flex-direction:row;
-  align-items:flex-end;justify-content:space-between;
-  padding-bottom:8px;min-height:0;
-}
-
-/* Player side — left */
-.player-side{display:flex;flex-direction:column;align-items:flex-start;gap:0;}
-.player-sprite{animation:p-idle 4s ease-in-out infinite;}
-@keyframes p-idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-.player-sprite.attack{animation:p-attack .45s ease forwards;}
-@keyframes p-attack{0%{transform:translateX(0)}40%{transform:translateX(40px) scale(1.05)}70%{transform:translateX(-8px)}100%{transform:translateX(0) scale(1)}}
-
-/* Enemy side — right */
-.enemy-side{display:flex;flex-direction:column;align-items:flex-end;gap:0;}
-.enemy-name{font-family:'Spectral',serif;font-size:15px;font-weight:600;color:#e8d8c0;letter-spacing:.04em;text-align:right;margin-bottom:4px;}
-.enemy-status{font-size:11px;font-weight:800;color:#c05050;background:rgba(180,40,40,.2);border:1px solid rgba(180,40,40,.35);border-radius:99px;padding:2px 10px;letter-spacing:.04em;margin-bottom:5px;}
-.enemy-hp-wrap{width:160px;margin-bottom:8px;}
-.enemy-hp-track{height:8px;background:rgba(0,0,0,.4);border-radius:99px;overflow:hidden;border:1px solid rgba(255,255,255,.06);}
-.enemy-hp-fill{height:100%;background:linear-gradient(90deg,#802020,#d04040);border-radius:99px;transition:width .6s ease;}
-.enemy-hp-lbl{font-size:10px;font-weight:800;color:#c09080;text-align:right;margin-top:3px;}
-.enemy-sprite{animation:e-float 3.5s ease-in-out infinite;}
-@keyframes e-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-.enemy-sprite.hit{animation:e-hit .35s ease forwards;}
-@keyframes e-hit{0%{transform:translateX(0)}20%{transform:translateX(12px)}50%{transform:translateX(-10px)}80%{transform:translateX(6px)}100%{transform:translateX(0)}}
-.enemy-sprite.heal{animation:e-heal .6s ease forwards;}
-@keyframes e-heal{0%{transform:scale(1) rotate(0)}40%{transform:scale(1.15) rotate(3deg)}70%{transform:scale(.95) rotate(-2deg)}100%{transform:scale(1) rotate(0)}}
-
-/* Player bars — side by side below battle field */
-.p-bars-row{
-  display:flex;flex-direction:row;gap:10px;
-  padding:8px 16px 6px;
-  background:rgba(4,10,2,.7);
-  border-top:1px solid rgba(80,140,30,.2);
-  flex-shrink:0;
-}
-.p-bar-item{flex:1;display:flex;flex-direction:column;gap:3px;}
-.p-bar-lbl{font-size:10px;font-weight:800;color:#8aaa60;letter-spacing:.05em;}
-.p-bar-track{height:7px;background:rgba(0,0,0,.4);border-radius:99px;overflow:hidden;border:1px solid rgba(255,255,255,.05);}
-.p-bar-fill{height:100%;border-radius:99px;transition:width .6s ease;}
-.p-bar-hp{background:linear-gradient(90deg,#b02020,#e84040);}
-.p-bar-mp{background:linear-gradient(90deg,#2050a0,#4090e0);}
-
-/* Battle log */
-.battle-log{
-  background:rgba(4,10,2,.82);
-  border-top:1px solid rgba(80,140,30,.15);
-  border-bottom:1px solid rgba(80,140,30,.15);
-  padding:9px 16px;
-  font-family:'Spectral',serif;font-style:italic;
-  font-size:13px;color:#90b868;line-height:1.55;
-  min-height:50px;flex-shrink:0;
-}
-
-/* Battle menu */
-.battle-menu{
-  background:rgba(6,14,3,.95);
-  padding:12px 12px calc(12px + var(--safe-bottom));
-  flex-shrink:0;
-}
-.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.menu-btn{
-  background:rgba(255,255,255,.05);
-  border:1.5px solid rgba(120,180,60,.25);
-  border-radius:14px;padding:12px 10px;
-  display:flex;flex-direction:column;align-items:center;gap:5px;
-  cursor:pointer;transition:all .16s;
-  -webkit-tap-highlight-color:transparent;
-}
-.menu-btn:active{background:rgba(120,180,60,.12);transform:scale(.96);}
-.menu-btn:disabled{opacity:.35;pointer-events:none;}
-.menu-btn-ico{font-size:22px;line-height:1;}
-.menu-btn-lbl{font-size:13px;font-weight:900;color:#b8d880;letter-spacing:.03em;}
-
-/* Damage / heal floaters */
-.floater{
-  position:absolute;font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;
-  pointer-events:none;z-index:50;
-  animation:float-up .9s ease forwards;
-}
-@keyframes float-up{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-60px)}}
-.floater.dmg{color:#ff6060;text-shadow:0 2px 8px rgba(0,0,0,.6);}
-.floater.heal{color:#60e860;text-shadow:0 2px 8px rgba(0,0,0,.6);}
-.floater.special{color:#80c0ff;text-shadow:0 2px 8px rgba(0,0,0,.6);}
-
-/* Victory overlay */
-.victory-wrap{position:absolute;inset:0;z-index:60;background:rgba(4,12,2,.92);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:36px;}
-.victory-wrap.show{display:flex;}
-.v-title{font-family:'Spectral',serif;font-size:28px;font-weight:600;color:#c8e890;text-align:center;}
-.v-msg{font-family:'Spectral',serif;font-style:italic;font-size:14px;color:#7aaa48;text-align:center;line-height:1.65;max-width:280px;}
-.v-rewards{display:flex;gap:12px;margin-top:4px;}
-.v-reward{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid rgba(140,200,80,.25);border-radius:12px;padding:10px 18px;font-size:15px;font-weight:900;}
-.v-reward.xp{color:#e8d060;}
-.v-reward.wd{color:#90d8f0;}
-.btn-continue{margin-top:8px;background:#3d5e1a;color:#d0e8b0;border:none;border-radius:99px;padding:14px 40px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;cursor:pointer;letter-spacing:.06em;text-transform:uppercase;}
-.btn-continue:active{transform:scale(.97);}
-
-/* ══════════════════════════════
-   NAV BAR  — brighter & whimsical
-══════════════════════════════ */
-/* ── FLOATING NAV (overlays all screens) ── */
-#floatNav{
-  position:fixed;
-  bottom:calc(14px + var(--safe-bottom));
+/* Grove companion */
+.grove-area{
+  position:absolute;
   left:50%;transform:translateX(-50%);
-  width:90%;max-width:400px;
-  z-index:200;
-  background:rgba(12,28,5,.88);
-  border:1.5px solid rgba(140,200,80,.42);
-  border-radius:10px;
-  padding:8px 10px;
-  backdrop-filter:blur(14px);
-  box-shadow:0 8px 32px rgba(0,0,0,.45);
-  display:flex;align-items:stretch;gap:4px;
+  bottom:calc(var(--safe-bottom) + 78px + 16px + 52px);
+  z-index:10;
+  cursor:pointer;
+  animation:g-float 3.5s ease-in-out infinite;
+  filter:drop-shadow(0 6px 0 rgba(0,0,0,.25));
 }
-.nb{
+@keyframes g-float{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-12px)}}
+.grove-area.pop{animation:g-pop .5s ease forwards;}
+@keyframes g-pop{0%{transform:translateX(-50%) translateY(0) scale(1)}30%{transform:translateX(-50%) translateY(-20px) scale(1.08)}65%{transform:translateX(-50%) translateY(3px) scale(.97)}85%{transform:translateX(-50%) translateY(-5px) scale(1.02)}100%{transform:translateX(-50%) translateY(0) scale(1)}}
+
+/* Heart floater */
+.heart-floater{position:absolute;font-size:28px;pointer-events:none;z-index:50;animation:h-rise 1s ease forwards;}
+@keyframes h-rise{0%{opacity:1;transform:translateY(0) scale(1)}60%{opacity:.9;transform:translateY(-55px) scale(1.3)}100%{opacity:0;transform:translateY(-100px) scale(.6)}}
+
+/* Big action button */
+.action-btn-wrap{
+  position:absolute;
+  bottom:calc(var(--safe-bottom) + 78px + 16px);
+  left:50%;transform:translateX(-50%);
+  z-index:20;width:220px;
+}
+.action-btn{
+  width:100%;
+  background:var(--gold);
+  border:3.5px solid var(--outline);
+  border-radius:16px;
+  padding:13px 20px 10px;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;
+  box-shadow:0 5px 0 var(--gold-shadow), 0 5px 0 2px var(--outline);
+  transition:transform .1s, box-shadow .1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.action-btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--gold-shadow), 0 1px 0 2px var(--outline);}
+.action-btn-top{
+  position:absolute;inset:0;border-radius:13px;
+  background:linear-gradient(180deg,var(--gold-top) 0%,transparent 60%);
+  pointer-events:none;
+}
+.action-btn-title{font-size:18px;font-weight:900;color:var(--outline);letter-spacing:.02em;position:relative;z-index:1;}
+.action-btn-sub{font-size:12px;font-weight:800;color:rgba(42,26,8,.6);position:relative;z-index:1;}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  position:absolute;
+  bottom:calc(var(--safe-bottom) + 8px);
+  left:50%;transform:translateX(-50%);
+  z-index:20;
+  width:92%;max-width:400px;
+  background:var(--panel-bg);
+  border:3px solid var(--outline);
+  border-radius:18px;
+  padding:6px;
+  box-shadow:0 5px 0 var(--panel-shadow), 0 5px 0 2px var(--outline);
+  display:flex;gap:5px;
+}
+.nav-tile{
   flex:1;display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  gap:3px;padding:8px 4px 7px;
-  background:none;border:none;cursor:pointer;
+  gap:4px;padding:8px 4px 7px;
+  background:var(--panel-top);
+  border:2.5px solid var(--outline);
+  border-radius:12px;
+  cursor:pointer;
+  transition:transform .1s;
+  box-shadow:0 3px 0 var(--panel-shadow);
   -webkit-tap-highlight-color:transparent;
-  transition:all .15s;border-radius:8px;
+  position:relative;
 }
-.nb:active{transform:scale(.88);background:rgba(140,200,80,.1);}
-.nb.on{background:rgba(140,200,80,.14);}
-.nb-ico{width:32px;height:32px;display:flex;align-items:center;justify-content:center;}
-.nb-ico svg{width:32px;height:32px;}
-.nb-lbl{font-size:9px;font-weight:900;color:#6a9a38;letter-spacing:.05em;text-transform:uppercase;transition:color .15s;}
-.nb.on .nb-lbl{color:#c8f060;}
+.nav-tile:active{transform:translateY(2px);box-shadow:0 1px 0 var(--panel-shadow);}
+.nav-tile.on{background:var(--gold);box-shadow:0 3px 0 var(--gold-shadow);}
+.nav-tile.on .nav-lbl{color:var(--outline);}
+.nav-tile-ico{width:30px;height:30px;display:flex;align-items:center;justify-content:center;}
+.nav-tile-ico svg{width:30px;height:30px;}
+.nav-lbl{font-size:9px;font-weight:900;color:#f5e0c0;letter-spacing:.04em;text-transform:uppercase;}
+
+/* ═══════════════════════════════════════
+   EXPLORE SCREEN
+═══════════════════════════════════════ */
+#screen-explore{
+  background:linear-gradient(180deg,#3a7820 0%,#2a5a14 100%);
+}
+.exp-scene{position:absolute;inset:0;z-index:0;}
+.exp-content{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  height:100%;padding:0 24px calc(var(--safe-bottom)+100px);gap:16px;
+}
+.exp-panel{
+  width:100%;max-width:320px;
+  background:var(--panel-bg);
+  border:3px solid var(--outline);
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 5px 0 var(--panel-shadow), 0 5px 0 2px var(--outline);
+}
+.exp-panel-header{
+  background:var(--panel-top);
+  border-bottom:3px solid var(--outline);
+  padding:12px 16px;
+  font-size:18px;font-weight:900;color:white;
+  letter-spacing:.04em;text-align:center;
+}
+.exp-btn-row{
+  display:flex;flex-direction:column;gap:0;
+}
+.exp-row-btn{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 18px;
+  border-bottom:2px solid rgba(0,0,0,.2);
+  cursor:pointer;transition:background .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.exp-row-btn:last-child{border-bottom:none;}
+.exp-row-btn:active{background:rgba(0,0,0,.15);}
+.exp-row-ico{
+  width:44px;height:44px;border-radius:12px;
+  border:2.5px solid var(--outline);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+}
+.exp-row-ico.gold{background:var(--gold);box-shadow:0 3px 0 var(--gold-shadow);}
+.exp-row-ico.brown{background:#9a7048;box-shadow:0 3px 0 #6a4028;}
+.exp-row-text{}
+.exp-row-title{font-size:15px;font-weight:900;color:white;}
+.exp-row-sub{font-size:11px;font-weight:700;color:rgba(255,255,255,.6);margin-top:2px;}
+
+/* ═══════════════════════════════════════
+   BATTLE SCREEN
+═══════════════════════════════════════ */
+#screen-battle{background:#1a0a30;}
+
+.battle-scene{position:absolute;inset:0;z-index:0;}
+.battle-scene svg{width:100%;height:100%;display:block;}
+
+.battle-ui{position:relative;z-index:2;display:flex;flex-direction:column;height:100%;}
+.battle-field{
+  flex:1;display:flex;flex-direction:row;
+  align-items:flex-end;justify-content:space-between;
+  padding:calc(var(--safe-top)+12px) 16px 12px;
+  min-height:0;
+}
+
+/* Enemy side — right */
+.enemy-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+.enemy-plate{
+  background:rgba(20,8,40,.75);
+  border:2.5px solid rgba(200,80,255,.4);
+  border-radius:12px;
+  padding:7px 12px;
+  display:flex;flex-direction:column;align-items:flex-end;gap:4px;
+}
+.enemy-name-lbl{font-size:13px;font-weight:900;color:#e0c0ff;text-align:right;}
+.enemy-status-chip{
+  font-size:10px;font-weight:900;color:#ff6060;
+  background:rgba(180,20,20,.3);border:1.5px solid rgba(255,60,60,.4);
+  border-radius:99px;padding:2px 9px;
+}
+.e-hp-track{width:140px;height:8px;background:rgba(0,0,0,.5);border-radius:99px;overflow:hidden;border:1.5px solid rgba(255,255,255,.1);}
+.e-hp-fill{height:100%;background:linear-gradient(90deg,#a01818,#e03030);border-radius:99px;transition:width .5s ease;}
+.e-hp-lbl{font-size:9px;font-weight:900;color:#d09090;text-align:right;}
+.enemy-sprite-wrap{animation:e-float 3s ease-in-out infinite;}
+@keyframes e-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.enemy-sprite-wrap.hit{animation:e-hit .3s ease forwards;}
+@keyframes e-hit{0%{transform:translateX(0)}25%{transform:translateX(10px)}75%{transform:translateX(-7px)}100%{transform:translateX(0)}}
+.enemy-sprite-wrap.heal{animation:e-heal .6s ease forwards;}
+@keyframes e-heal{0%{transform:scale(1)}40%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+/* Player side — left */
+.player-side-b{display:flex;flex-direction:column;align-items:flex-start;gap:6px;}
+.player-plate{
+  background:rgba(10,30,8,.75);
+  border:2.5px solid rgba(80,200,60,.35);
+  border-radius:12px;
+  padding:7px 12px;
+  display:flex;flex-direction:column;gap:4px;
+}
+.p-bars-side{display:flex;flex-direction:column;gap:4px;width:130px;}
+.p-bar-item{display:flex;align-items:center;gap:6px;}
+.p-bar-lbl-b{font-size:10px;font-weight:900;color:#a0e080;width:22px;}
+.p-bar-track-b{flex:1;height:7px;background:rgba(0,0,0,.5);border-radius:99px;overflow:hidden;border:1.5px solid rgba(255,255,255,.08);}
+.p-bar-fill-b{height:100%;border-radius:99px;transition:width .5s ease;}
+.p-hp-fill{background:linear-gradient(90deg,#b02020,#e84040);}
+.p-mp-fill{background:linear-gradient(90deg,#2040a0,#4080e0);}
+.player-sprite-b{animation:p-idle 4s ease-in-out infinite;}
+@keyframes p-idle{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.player-sprite-b.attack{animation:p-atk .4s ease forwards;}
+@keyframes p-atk{0%{transform:translateX(0)}40%{transform:translateX(38px) scale(1.06)}75%{transform:translateX(-6px)}100%{transform:translateX(0) scale(1)}}
+
+/* Battle log panel */
+.battle-log-panel{
+  margin:0 12px 8px;
+  background:rgba(10,5,20,.82);
+  border:2.5px solid rgba(150,80,255,.3);
+  border-radius:14px;
+  padding:10px 14px;
+  font-size:13px;font-weight:700;
+  color:#c0a0e8;line-height:1.5;
+  min-height:50px;flex-shrink:0;
+  font-family:'Nunito',sans-serif;
+}
+
+/* Battle menu panel */
+.battle-menu-panel{
+  flex-shrink:0;
+  background:var(--panel-bg);
+  border-top:3px solid var(--outline);
+  padding:10px 10px calc(10px + var(--safe-bottom));
+}
+.b-menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.b-btn{
+  background:var(--panel-top);
+  border:3px solid var(--outline);
+  border-radius:14px;
+  padding:12px 8px 9px;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  cursor:pointer;
+  box-shadow:0 4px 0 var(--panel-shadow);
+  transition:transform .1s, box-shadow .1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.b-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--panel-shadow);}
+.b-btn:disabled{opacity:.4;pointer-events:none;}
+.b-btn-ico{font-size:24px;line-height:1;}
+.b-btn-lbl{font-size:12px;font-weight:900;color:white;letter-spacing:.02em;}
+
+/* Victory overlay */
+.victory-wrap{
+  position:absolute;inset:0;z-index:60;
+  background:rgba(10,5,20,.92);
+  display:none;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:14px;padding:36px;
+}
+.victory-wrap.show{display:flex;}
+.v-ico{font-size:56px;}
+.v-title{font-size:26px;font-weight:900;color:white;text-align:center;}
+.v-msg{font-size:13px;font-weight:700;color:#a0c880;text-align:center;line-height:1.65;max-width:280px;}
+.v-rewards{display:flex;gap:12px;}
+.v-reward{
+  display:flex;align-items:center;gap:7px;
+  background:var(--panel-bg);
+  border:2.5px solid var(--outline);
+  border-radius:12px;padding:10px 18px;
+  font-size:15px;font-weight:900;color:white;
+  box-shadow:0 4px 0 var(--panel-shadow);
+}
+.v-reward.gold-reward{background:var(--gold);color:var(--outline);}
+.btn-continue{
+  background:var(--btn-green);
+  border:3px solid var(--outline);
+  border-radius:14px;
+  padding:14px 40px;
+  font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;
+  color:white;cursor:pointer;
+  box-shadow:0 5px 0 var(--btn-green-shadow), 0 5px 0 2px var(--outline);
+  transition:transform .1s;letter-spacing:.04em;
+}
+.btn-continue:active{transform:translateY(4px);box-shadow:0 1px 0 var(--btn-green-shadow), 0 1px 0 2px var(--outline);}
+
+/* Floaters */
+.floater{position:absolute;font-family:'Nunito',sans-serif;font-size:22px;font-weight:900;pointer-events:none;z-index:50;animation:float-up .9s ease forwards;}
+@keyframes float-up{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-60px)}}
+.floater.dmg{color:#ff5050;-webkit-text-stroke:2px #300;}
+.floater.heal{color:#50e850;-webkit-text-stroke:2px #030;}
+.floater.special{color:#80c0ff;-webkit-text-stroke:2px #003;}
 </style>
 </head>
 <body>
 <div id="app">
 
-<!-- ══ HOME ══ -->
+<!-- ═══════════════════════════════════════
+     HOME SCREEN
+═══════════════════════════════════════ -->
 <div class="screen active" id="screen-home">
-  <div class="toast" id="toast"></div>
-  <div class="home-scene">
+
+  <!-- World background -->
+  <div class="world-bg">
     <svg viewBox="0 0 430 780" preserveAspectRatio="xMidYMid slice">
-      <!-- Daytime sky — bright, warm -->
-      <defs>
-        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#7ec8e8"/>
-          <stop offset="55%" stop-color="#b8e4f0"/>
-          <stop offset="100%" stop-color="#d4eec4"/>
-        </linearGradient>
-        <linearGradient id="groundGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#6ab840"/>
-          <stop offset="100%" stop-color="#4a8a28"/>
-        </linearGradient>
-      </defs>
-      <rect width="430" height="780" fill="url(#skyGrad)"/>
-      <!-- Sun -->
-      <circle cx="340" cy="70" r="38" fill="#ffe060" opacity=".85"/>
-      <circle cx="340" cy="70" r="46" fill="#ffe060" opacity=".2"/>
-      <!-- Clouds -->
-      <ellipse cx="80" cy="80" rx="55" ry="22" fill="white" opacity=".82"/>
-      <ellipse cx="50" cy="85" rx="30" ry="18" fill="white" opacity=".75"/>
-      <ellipse cx="110" cy="78" rx="30" ry="16" fill="white" opacity=".75"/>
-      <ellipse cx="260" cy="55" rx="48" ry="19" fill="white" opacity=".7"/>
-      <ellipse cx="230" cy="60" rx="28" ry="15" fill="white" opacity=".65"/>
-      <ellipse cx="290" cy="58" rx="28" ry="14" fill="white" opacity=".65"/>
+      <!-- Sky -->
+      <rect width="430" height="780" fill="#5ab8e8"/>
+      <!-- Sun glow -->
+      <circle cx="340" cy="80" r="52" fill="#ffe87a" opacity=".35"/>
+      <circle cx="340" cy="80" r="36" fill="#ffe060"/>
+      <!-- Cloud 1 -->
+      <ellipse cx="120" cy="90" rx="62" ry="26" fill="white"/>
+      <ellipse cx="88" cy="98" rx="36" ry="22" fill="white"/>
+      <ellipse cx="155" cy="96" rx="34" ry="20" fill="white"/>
+      <!-- Cloud 2 -->
+      <ellipse cx="310" cy="60" rx="46" ry="20" fill="white" opacity=".9"/>
+      <ellipse cx="282" cy="68" rx="28" ry="16" fill="white" opacity=".9"/>
+      <ellipse cx="340" cy="66" rx="26" ry="15" fill="white" opacity=".9"/>
       <!-- Distant hills -->
-      <ellipse cx="80" cy="460" rx="180" ry="280" fill="#5aaa30" opacity=".5"/>
-      <ellipse cx="370" cy="450" rx="180" ry="270" fill="#4e9e28" opacity=".5"/>
-      <!-- Back trees -->
-      <ellipse cx="18" cy="500" rx="44" ry="260" fill="#3a7a18"/>
-      <ellipse cx="412" cy="490" rx="46" ry="270" fill="#3a7a18"/>
-      <ellipse cx="68" cy="490" rx="36" ry="210" fill="#448820"/>
-      <ellipse cx="365" cy="485" rx="38" ry="220" fill="#448820"/>
+      <ellipse cx="100" cy="520" rx="200" ry="160" fill="#7acc48"/>
+      <ellipse cx="340" cy="510" rx="200" ry="155" fill="#72c040"/>
+      <!-- Back trees (thick outlines, cartoon) -->
+      <!-- Tree L -->
+      <rect x="12" y="340" width="22" height="160" rx="8" fill="#7a4a1a" stroke="#2a1a08" stroke-width="3"/>
+      <ellipse cx="23" cy="330" rx="44" ry="100" fill="#2a8018" stroke="#1a5010" stroke-width="3"/>
+      <ellipse cx="23" cy="310" rx="36" ry="80" fill="#38a020" stroke="#1a5010" stroke-width="3"/>
+      <!-- Tree R -->
+      <rect x="396" y="350" width="22" height="150" rx="8" fill="#7a4a1a" stroke="#2a1a08" stroke-width="3"/>
+      <ellipse cx="407" cy="340" rx="44" ry="95" fill="#2a8018" stroke="#1a5010" stroke-width="3"/>
+      <ellipse cx="407" cy="320" rx="36" ry="76" fill="#38a020" stroke="#1a5010" stroke-width="3"/>
       <!-- Mid trees -->
-      <ellipse cx="30" cy="530" rx="32" ry="170" fill="#5aa030"/>
-      <ellipse cx="400" cy="520" rx="34" ry="180" fill="#5aa030"/>
-      <ellipse cx="88" cy="540" rx="28" ry="145" fill="#60aa34"/>
-      <ellipse cx="348" cy="535" rx="30" ry="155" fill="#60aa34"/>
-      <!-- Hanging vines (lighter) -->
-      <path d="M48 200 Q44 280 52 360 Q46 420 44 490" stroke="#3a7a18" stroke-width="2.5" fill="none" opacity=".55"/>
-      <path d="M382 210 Q386 295 376 375 Q382 435 384 500" stroke="#3a7a18" stroke-width="2" fill="none" opacity=".45"/>
-      <ellipse cx="52" cy="365" rx="10" ry="6" fill="#50901c" opacity=".7"/>
-      <ellipse cx="376" cy="380" rx="9" ry="5" fill="#50901c" opacity=".6"/>
-      <!-- Mushroom (brighter) -->
-      <ellipse cx="126" cy="645" rx="13" ry="5" fill="#5a2808"/>
-      <rect x="123" y="618" width="6" height="28" rx="3" fill="#7a3a10"/>
-      <ellipse cx="126" cy="617" rx="19" ry="9" fill="#e03820"/>
-      <circle cx="121" cy="615" r="2" fill="white" opacity=".8"/>
-      <circle cx="128" cy="613" r="1.8" fill="white" opacity=".8"/>
-      <circle cx="135" cy="616" r="2" fill="white" opacity=".8"/>
+      <rect x="56" y="380" width="18" height="130" rx="6" fill="#7a4a1a" stroke="#2a1a08" stroke-width="2.5"/>
+      <ellipse cx="65" cy="370" rx="36" ry="78" fill="#30a020" stroke="#1a5010" stroke-width="2.5"/>
+      <ellipse cx="65" cy="352" rx="28" ry="62" fill="#42b828" stroke="#1a5010" stroke-width="2.5"/>
+      <rect x="355" y="388" width="18" height="125" rx="6" fill="#7a4a1a" stroke="#2a1a08" stroke-width="2.5"/>
+      <ellipse cx="364" cy="378" rx="36" ry="75" fill="#30a020" stroke="#1a5010" stroke-width="2.5"/>
+      <ellipse cx="364" cy="360" rx="28" ry="60" fill="#42b828" stroke="#1a5010" stroke-width="2.5"/>
       <!-- Ground -->
-      <ellipse cx="215" cy="700" rx="260" ry="130" fill="url(#groundGrad)"/>
-      <rect x="0" y="700" width="430" height="80" fill="#4a8a28"/>
+      <ellipse cx="215" cy="590" rx="280" ry="120" fill="#7acc48"/>
+      <rect x="0" y="590" width="430" height="200" fill="#6ab840"/>
+      <!-- Ground outline -->
+      <path d="M0 562 Q108 520 215 530 Q322 520 430 562" stroke="#4a9820" stroke-width="4" fill="none"/>
+      <!-- Flowers -->
+      <circle cx="120" cy="575" r="7" fill="#ffe060" stroke="#2a1a08" stroke-width="2"/>
+      <circle cx="130" cy="565" r="5" fill="white" stroke="#2a1a08" stroke-width="1.5"/>
+      <circle cx="290" cy="570" r="6" fill="#ff8090" stroke="#2a1a08" stroke-width="2"/>
+      <circle cx="300" cy="578" r="5" fill="#ffe060" stroke="#2a1a08" stroke-width="1.5"/>
+      <circle cx="340" cy="568" r="5" fill="white" stroke="#2a1a08" stroke-width="1.5"/>
       <!-- Grass tufts -->
-      <path d="M14 700 Q19 676 24 700" stroke="#6ab838" stroke-width="2.5" fill="none"/>
-      <path d="M24 700 Q30 672 35 700" stroke="#5aa02e" stroke-width="3" fill="none"/>
-      <path d="M386 700 Q391 675 396 700" stroke="#6ab838" stroke-width="2.5" fill="none"/>
-      <path d="M396 700 Q400 678 405 700" stroke="#5aa02e" stroke-width="2.5" fill="none"/>
-      <!-- Mossy log -->
-      <rect x="5" y="698" width="84" height="18" rx="9" fill="#3a1e08"/>
-      <ellipse cx="47" cy="698" rx="42" ry="6" fill="#5aa028" opacity=".65"/>
-      <!-- Flowers (bright) -->
-      <circle cx="285" cy="698" r="6" fill="#f080b0"/>
-      <circle cx="285" cy="698" r="2.5" fill="#ffe060"/>
-      <circle cx="313" cy="702" r="5" fill="#f0d030"/>
-      <circle cx="313" cy="702" r="2" fill="#fff080"/>
-      <circle cx="330" cy="699" r="4" fill="#80d0f0"/>
-      <circle cx="330" cy="699" r="1.5" fill="white"/>
-      <!-- Ground path -->
-      <ellipse cx="215" cy="740" rx="70" ry="18" fill="#3a7818" opacity=".5"/>
-      <!-- Butterflies -->
-      <path d="M170 380 Q166 374 162 380 Q166 386 170 380Z" fill="#f0d060" opacity=".8"/>
-      <path d="M170 380 Q174 374 178 380 Q174 386 170 380Z" fill="#f0c040" opacity=".8"/>
-      <path d="M280 320 Q276 314 272 320 Q276 326 280 320Z" fill="#c080f0" opacity=".7"/>
-      <path d="M280 320 Q284 314 288 320 Q284 326 280 320Z" fill="#a060e0" opacity=".7"/>
+      <path d="M80 590 Q84 578 88 590" stroke="#4a9820" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M90 590 Q95 574 100 590" stroke="#3a8818" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M330 590 Q334 576 338 590" stroke="#4a9820" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M340 590 Q345 578 350 590" stroke="#3a8818" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- Bushes bottom -->
+      <ellipse cx="50" cy="700" rx="70" ry="50" fill="#2a8020" stroke="#1a5010" stroke-width="3"/>
+      <ellipse cx="20" cy="710" rx="50" ry="40" fill="#38a028" stroke="#1a5010" stroke-width="3"/>
+      <ellipse cx="380" cy="700" rx="70" ry="50" fill="#2a8020" stroke="#1a5010" stroke-width="3"/>
+      <ellipse cx="410" cy="710" rx="50" ry="40" fill="#38a028" stroke="#1a5010" stroke-width="3"/>
+      <ellipse cx="215" cy="720" rx="80" ry="45" fill="#2a8020" stroke="#1a5010" stroke-width="3"/>
     </svg>
   </div>
+
   <div id="motesContainer"></div>
-  <div class="home-ui">
-    <!-- Grove — 3x size, centred -->
-    <div class="grove-center">
-      <div class="grove-svg-wrap" id="groveWrap" onclick="petGrove()">
-        <svg width="390" height="490" viewBox="0 0 160 200" fill="none">
-          <!-- Shadow -->
-          <ellipse cx="80" cy="193" rx="36" ry="7" fill="rgba(20,60,5,.35)"/>
-          <!-- Tail — long, curling leaf-shaped -->
-          <path d="M108 155 Q138 140 142 118 Q146 96 130 88 Q122 84 118 92 Q114 102 122 108 Q130 114 126 124 Q120 136 106 142Z" fill="#3a7a1a" stroke="#2a5a10" stroke-width="1.5"/>
-          <path d="M120 96 Q128 100 124 110" stroke="#4a9a28" stroke-width="1" fill="none" stroke-linecap="round" opacity=".6"/>
-          <!-- Hind legs -->
-          <ellipse cx="60" cy="178" rx="14" ry="9" fill="#2e6a14" transform="rotate(-10 60 178)"/>
-          <ellipse cx="100" cy="180" rx="14" ry="9" fill="#2e6a14" transform="rotate(10 100 180)"/>
-          <!-- Hind paws — leaf shaped -->
-          <ellipse cx="54" cy="185" rx="12" ry="6" fill="#3a8020" transform="rotate(-8 54 185)"/>
-          <ellipse cx="106" cy="186" rx="12" ry="6" fill="#3a8020" transform="rotate(8 106 186)"/>
-          <!-- Toe lines -->
-          <path d="M48 186 Q51 189 54 186" stroke="#2a6010" stroke-width="1" fill="none"/>
-          <path d="M100 187 Q104 190 108 187" stroke="#2a6010" stroke-width="1" fill="none"/>
-          <!-- Body — rounded, leaf-textured -->
-          <ellipse cx="80" cy="148" rx="44" ry="46" fill="#3a8020"/>
-          <!-- Leaf vein overlay on body -->
-          <path d="M80 108 Q80 148 80 186" stroke="#4aaa28" stroke-width="1.5" fill="none" opacity=".3"/>
-          <path d="M60 120 Q80 132 100 120" stroke="#4aaa28" stroke-width="1" fill="none" opacity=".25"/>
-          <path d="M55 138 Q80 148 105 138" stroke="#4aaa28" stroke-width="1" fill="none" opacity=".25"/>
-          <!-- Body highlight -->
-          <ellipse cx="68" cy="128" rx="18" ry="14" fill="#4aaa28" opacity=".35"/>
-          <!-- Front legs -->
-          <path d="M52 162 Q42 172 44 182" stroke="#2e6a14" stroke-width="14" stroke-linecap="round" fill="none"/>
-          <path d="M108 162 Q118 172 116 182" stroke="#2e6a14" stroke-width="14" stroke-linecap="round" fill="none"/>
-          <!-- Front paws -->
-          <ellipse cx="44" cy="184" rx="11" ry="6" fill="#3a8020" transform="rotate(-5 44 184)"/>
-          <ellipse cx="116" cy="184" rx="11" ry="6" fill="#3a8020" transform="rotate(5 116 184)"/>
-          <path d="M38 184 Q41 187 44 184" stroke="#2a6010" stroke-width="1" fill="none"/>
-          <path d="M110 184 Q114 187 118 184" stroke="#2a6010" stroke-width="1" fill="none"/>
-          <!-- Neck -->
-          <ellipse cx="80" cy="108" rx="24" ry="16" fill="#3a8020"/>
-          <!-- Head — round like a cat -->
-          <ellipse cx="80" cy="82" rx="36" ry="34" fill="#3a8020"/>
-          <!-- Leaf ears — large, pointed, with inner lighter leaf -->
-          <path d="M48 60 Q42 30 58 22 Q62 42 56 60Z" fill="#3a8020" stroke="#2a5a10" stroke-width="1.5"/>
-          <path d="M50 58 Q46 36 58 28 Q60 44 56 58Z" fill="#7acc40"/>
-          <path d="M112 60 Q118 30 102 22 Q98 42 104 60Z" fill="#3a8020" stroke="#2a5a10" stroke-width="1.5"/>
-          <path d="M110 58 Q114 36 102 28 Q100 44 104 58Z" fill="#7acc40"/>
-          <!-- Ear tufts (tiny leaf sprig) -->
-          <path d="M54 24 Q52 18 56 14 Q58 20 54 24Z" fill="#5aba28"/>
-          <path d="M106 24 Q108 18 104 14 Q102 20 106 24Z" fill="#5aba28"/>
-          <!-- Face — lighter muzzle -->
-          <ellipse cx="80" cy="90" rx="20" ry="16" fill="#5aaa28"/>
-          <!-- Eyes — large, round, Pokémon-style -->
-          <ellipse cx="65" cy="76" rx="11" ry="12" fill="#d8f8a0"/>
-          <ellipse cx="95" cy="76" rx="11" ry="12" fill="#d8f8a0"/>
-          <!-- Iris -->
-          <circle cx="65" cy="78" r="7.5" fill="#1a6008"/>
-          <circle cx="95" cy="78" r="7.5" fill="#1a6008"/>
-          <!-- Pupil -->
-          <ellipse cx="65" cy="79" rx="4" ry="6" fill="#0a1e04"/>
-          <ellipse cx="95" cy="79" rx="4" ry="6" fill="#0a1e04"/>
-          <!-- Eye shine -->
-          <circle cx="68" cy="75" r="2.5" fill="white"/>
-          <circle cx="98" cy="75" r="2.5" fill="white"/>
-          <circle cx="62" cy="80" r="1.2" fill="white" opacity=".6"/>
-          <circle cx="92" cy="80" r="1.2" fill="white" opacity=".6"/>
-          <!-- Cat nose — tiny leaf shape -->
-          <path d="M78 90 Q80 87 82 90 Q80 93 78 90Z" fill="#1a5008"/>
-          <!-- Cat mouth -->
-          <path d="M75 93 Q80 98 85 93" stroke="#1a5008" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-          <path d="M80 93 L80 96" stroke="#1a5008" stroke-width="1.5" stroke-linecap="round"/>
-          <!-- Whiskers — thin vine-like -->
-          <line x1="38" y1="88" x2="62" y2="92" stroke="#2a6010" stroke-width="1" stroke-linecap="round" opacity=".7"/>
-          <line x1="38" y1="93" x2="62" y2="94" stroke="#2a6010" stroke-width="1" stroke-linecap="round" opacity=".7"/>
-          <line x1="98" y1="92" x2="122" y2="88" stroke="#2a6010" stroke-width="1" stroke-linecap="round" opacity=".7"/>
-          <line x1="98" y1="94" x2="122" y2="93" stroke="#2a6010" stroke-width="1" stroke-linecap="round" opacity=".7"/>
-          <!-- Cheek blush — leaf tinted -->
-          <ellipse cx="50" cy="88" rx="8" ry="5" fill="rgba(80,200,40,.3)"/>
-          <ellipse cx="110" cy="88" rx="8" ry="5" fill="rgba(80,200,40,.3)"/>
-          <!-- Forehead leaf marking -->
-          <path d="M80 56 Q85 48 80 42 Q75 48 80 56Z" fill="#7acc40"/>
-          <path d="M80 56 L80 44" stroke="#5aba28" stroke-width="1" fill="none"/>
-          <!-- Small leaf sprigs on body -->
-          <path d="M42 130 Q36 122 40 114 Q46 120 42 130Z" fill="#5aba28"/>
-          <path d="M118 126 Q124 118 120 110 Q114 116 118 126Z" fill="#5aba28"/>
+
+  <!-- Top HUD -->
+  <div class="top-hud">
+    <div class="player-card">
+      <div class="player-avatar">
+        <!-- tiny Grove icon -->
+        <svg width="34" height="34" viewBox="0 0 160 160" fill="none">
+          <ellipse cx="80" cy="80" rx="78" ry="78" fill="#3a8020"/>
+          <ellipse cx="80" cy="85" rx="44" ry="46" fill="#4aaa28"/>
+          <path d="M48 55 Q42 28 58 20 Q62 38 56 55Z" fill="#3a8020" stroke="#1a5010" stroke-width="2"/>
+          <path d="M50 53 Q46 32 58 26 Q60 40 56 53Z" fill="#7acc40"/>
+          <path d="M112 55 Q118 28 102 20 Q98 38 104 55Z" fill="#3a8020" stroke="#1a5010" stroke-width="2"/>
+          <path d="M110 53 Q114 32 102 26 Q100 40 104 53Z" fill="#7acc40"/>
+          <ellipse cx="62" cy="76" rx="11" ry="12" fill="#d8f8a0"/>
+          <ellipse cx="98" cy="76" rx="11" ry="12" fill="#d8f8a0"/>
+          <circle cx="62" cy="78" r="7" fill="#1a6008"/>
+          <circle cx="98" cy="78" r="7" fill="#1a6008"/>
+          <ellipse cx="62" cy="79" rx="4" ry="5.5" fill="#0a1e04"/>
+          <ellipse cx="98" cy="79" rx="4" ry="5.5" fill="#0a1e04"/>
+          <circle cx="65" cy="75" r="2.5" fill="white"/>
+          <circle cx="101" cy="75" r="2.5" fill="white"/>
         </svg>
       </div>
-    </div>
-
-    <!-- Horizontal HP / Energy bars centred above card -->
-    <div class="h-bars">
-      <div class="h-bar-row">
-        <div class="h-bar-ico">&#10084;&#65039;</div>
-        <div class="h-bar-track"><div class="h-bar-fill h-bar-hp" id="hpBar" style="width:80%"></div></div>
-      </div>
-      <div class="h-bar-row">
-        <div class="h-bar-ico">&#9889;</div>
-        <div class="h-bar-track"><div class="h-bar-fill h-bar-en" id="enBar" style="width:65%"></div></div>
+      <div class="player-info-col">
+        <div class="player-level">Lv. 1 Seedling</div>
+        <div class="player-name-lbl">Grove</div>
+        <div class="hp-bar-wrap">
+          <div class="hp-bar-track"><div class="hp-bar-fill" id="hpBar" style="width:80%"></div></div>
+          <div class="hp-bar-track" style="margin-top:2px"><div class="hp-bar-fill en-bar-fill" id="enBar" style="width:65%"></div></div>
+          <div class="hp-bar-lbl" id="hpLbl">HP 80/100</div>
+        </div>
       </div>
     </div>
-
-
+    <div class="resource-pills">
+      <div class="res-pill">
+        <svg width="18" height="22" viewBox="0 0 16 20" fill="none"><path d="M8 1 Q14 8 14 12 A6 6 0 0 1 2 12 Q2 8 8 1Z" fill="#4ab8d8" stroke="#1a5878" stroke-width="1.5"/><path d="M6 14 Q8 16 10 14" stroke="rgba(255,255,255,.5)" stroke-width="1" fill="none" stroke-linecap="round"/></svg>
+        <div class="res-val" id="waterLbl">0</div>
+        <div class="res-dot"></div>
+      </div>
+    </div>
   </div>
-</div>
 
-<!-- ══ EXPLORE HUB ══ -->
+  <!-- Grove companion (big, in world) -->
+  <div class="grove-area" id="groveWrap" onclick="petGrove()">
+    <svg width="200" height="250" viewBox="0 0 160 200" fill="none">
+      <ellipse cx="80" cy="194" rx="34" ry="7" fill="rgba(0,0,0,.25)"/>
+      <!-- Tail -->
+      <path d="M108 152 Q136 138 140 116 Q144 94 128 86 Q120 82 116 90 Q112 100 120 106 Q128 112 124 122 Q118 134 106 140Z" fill="#2e6a14" stroke="#1a4008" stroke-width="2"/>
+      <!-- Body shadow -->
+      <ellipse cx="80" cy="148" rx="44" ry="46" fill="#236010"/>
+      <!-- Body -->
+      <ellipse cx="80" cy="145" rx="44" ry="46" fill="#3a8020" stroke="#1a5010" stroke-width="3"/>
+      <!-- Body highlight -->
+      <ellipse cx="66" cy="126" rx="18" ry="14" fill="#52a830" opacity=".5"/>
+      <!-- Hind legs -->
+      <ellipse cx="58" cy="179" rx="15" ry="9" fill="#2e6a14" stroke="#1a4008" stroke-width="2.5" transform="rotate(-10 58 179)"/>
+      <ellipse cx="102" cy="181" rx="15" ry="9" fill="#2e6a14" stroke="#1a4008" stroke-width="2.5" transform="rotate(10 102 181)"/>
+      <ellipse cx="52" cy="187" rx="13" ry="6" fill="#3a8020" stroke="#1a4008" stroke-width="2"/>
+      <ellipse cx="108" cy="188" rx="13" ry="6" fill="#3a8020" stroke="#1a4008" stroke-width="2"/>
+      <!-- Front legs -->
+      <path d="M50 160 Q40 170 42 182" stroke="#2e6a14" stroke-width="15" stroke-linecap="round" fill="none"/>
+      <path d="M50 160 Q40 170 42 182" stroke="#3a8020" stroke-width="11" stroke-linecap="round" fill="none"/>
+      <path d="M110 160 Q120 170 118 182" stroke="#2e6a14" stroke-width="15" stroke-linecap="round" fill="none"/>
+      <path d="M110 160 Q120 170 118 182" stroke="#3a8020" stroke-width="11" stroke-linecap="round" fill="none"/>
+      <ellipse cx="42" cy="184" rx="12" ry="6" fill="#3a8020" stroke="#1a4008" stroke-width="2"/>
+      <ellipse cx="118" cy="184" rx="12" ry="6" fill="#3a8020" stroke="#1a4008" stroke-width="2"/>
+      <!-- Neck -->
+      <ellipse cx="80" cy="107" rx="24" ry="16" fill="#3a8020" stroke="#1a5010" stroke-width="2.5"/>
+      <!-- Head shadow -->
+      <ellipse cx="80" cy="84" rx="36" ry="34" fill="#236010"/>
+      <!-- Head -->
+      <ellipse cx="80" cy="82" rx="36" ry="34" fill="#3a8020" stroke="#1a5010" stroke-width="3"/>
+      <!-- Ears -->
+      <path d="M48 62 Q42 32 58 22 Q62 42 56 62Z" fill="#3a8020" stroke="#1a5010" stroke-width="2.5"/>
+      <path d="M50 60 Q46 36 58 28 Q60 44 56 60Z" fill="#7acc40"/>
+      <path d="M112 62 Q118 32 102 22 Q98 42 104 62Z" fill="#3a8020" stroke="#1a5010" stroke-width="2.5"/>
+      <path d="M110 60 Q114 36 102 28 Q100 44 104 60Z" fill="#7acc40"/>
+      <!-- Muzzle -->
+      <ellipse cx="80" cy="90" rx="20" ry="16" fill="#52a030" stroke="#1a5010" stroke-width="2"/>
+      <!-- Eyes white -->
+      <ellipse cx="64" cy="76" rx="11" ry="12" fill="#d8f8a0" stroke="#1a5010" stroke-width="2"/>
+      <ellipse cx="96" cy="76" rx="11" ry="12" fill="#d8f8a0" stroke="#1a5010" stroke-width="2"/>
+      <!-- Iris -->
+      <circle cx="64" cy="78" r="7.5" fill="#1a6008"/>
+      <circle cx="96" cy="78" r="7.5" fill="#1a6008"/>
+      <!-- Pupil -->
+      <ellipse cx="64" cy="79" rx="4" ry="6" fill="#0a1a04"/>
+      <ellipse cx="96" cy="79" rx="4" ry="6" fill="#0a1a04"/>
+      <!-- Eye shine -->
+      <circle cx="67" cy="75" r="2.8" fill="white"/>
+      <circle cx="99" cy="75" r="2.8" fill="white"/>
+      <circle cx="61" cy="80" r="1.4" fill="white" opacity=".6"/>
+      <circle cx="93" cy="80" r="1.4" fill="white" opacity=".6"/>
+      <!-- Nose -->
+      <path d="M77 90 Q80 87 83 90 Q80 93 77 90Z" fill="#1a5008" stroke="#0a2804" stroke-width="1"/>
+      <!-- Mouth -->
+      <path d="M74 94 Q80 100 86 94" stroke="#1a5008" stroke-width="2" stroke-linecap="round" fill="none"/>
+      <line x1="80" y1="94" x2="80" y2="97" stroke="#1a5008" stroke-width="2" stroke-linecap="round"/>
+      <!-- Whiskers -->
+      <line x1="36" y1="88" x2="62" y2="92" stroke="#1a5010" stroke-width="1.5" stroke-linecap="round" opacity=".8"/>
+      <line x1="36" y1="94" x2="62" y2="95" stroke="#1a5010" stroke-width="1.5" stroke-linecap="round" opacity=".8"/>
+      <line x1="98" y1="92" x2="124" y2="88" stroke="#1a5010" stroke-width="1.5" stroke-linecap="round" opacity=".8"/>
+      <line x1="98" y1="95" x2="124" y2="94" stroke="#1a5010" stroke-width="1.5" stroke-linecap="round" opacity=".8"/>
+      <!-- Cheek blush -->
+      <ellipse cx="50" cy="88" rx="8" ry="5" fill="rgba(80,200,40,.3)"/>
+      <ellipse cx="110" cy="88" rx="8" ry="5" fill="rgba(80,200,40,.3)"/>
+      <!-- Forehead leaf -->
+      <path d="M80 56 Q86 47 80 40 Q74 47 80 56Z" fill="#7acc40" stroke="#3a8010" stroke-width="1.5"/>
+      <line x1="80" y1="56" x2="80" y2="42" stroke="#5aba28" stroke-width="1" fill="none"/>
+      <!-- Leaf sprigs on sides -->
+      <path d="M40 130 Q33 120 38 112 Q44 118 40 130Z" fill="#5aba28" stroke="#2a7010" stroke-width="1.5"/>
+      <path d="M120 128 Q127 118 122 110 Q116 116 120 128Z" fill="#5aba28" stroke="#2a7010" stroke-width="1.5"/>
+    </svg>
+  </div>
+
+  <!-- Big action button -->
+  <div class="action-btn-wrap">
+    <div class="action-btn" onclick="navTo('explore')">
+      <div class="action-btn-top"></div>
+      <div class="action-btn-title">Go Explore!</div>
+      <div class="action-btn-sub">⚡ Adventures await</div>
+    </div>
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav" id="bottomNav">
+    <div class="nav-tile on" id="nb-home" onclick="navTo('home')">
+      <div class="nav-tile-ico">
+        <svg viewBox="0 0 34 34" fill="none">
+          <path d="M4 19 Q8 10 17 6 Q26 10 30 19Z" fill="#5a8828" stroke="#2a1a08" stroke-width="2"/>
+          <rect x="21" y="8" width="4" height="6" rx="1" fill="#7a5828" stroke="#2a1a08" stroke-width="1.5"/>
+          <path d="M23 8 Q21 4 23 2 Q25 0 24 3" stroke="#c0b098" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".8"/>
+          <rect x="7" y="19" width="20" height="11" rx="2" fill="#c09050" stroke="#2a1a08" stroke-width="2"/>
+          <path d="M14 30 L14 24 Q17 22 20 24 L20 30Z" fill="#6a3818" stroke="#2a1a08" stroke-width="1.5"/>
+          <rect x="8" y="21" width="5" height="5" rx=".5" fill="#b8e8ff" stroke="#2a1a08" stroke-width="1.2"/>
+          <line x1="10.5" y1="21" x2="10.5" y2="26" stroke="#2a1a08" stroke-width=".8"/>
+          <line x1="8" y1="23.5" x2="13" y2="23.5" stroke="#2a1a08" stroke-width=".8"/>
+          <path d="M7 21 Q4 24 5 28" stroke="#4a9818" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <ellipse cx="4" cy="25" rx="2.5" ry="1.8" fill="#6ab820"/>
+          <path d="M27 21 Q30 24 29 28" stroke="#4a9818" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <ellipse cx="30" cy="25" rx="2.5" ry="1.8" fill="#6ab820"/>
+          <circle cx="17" cy="7" r="2.5" fill="#ff88b0" stroke="#2a1a08" stroke-width="1.2"/>
+          <circle cx="17" cy="7" r="1.2" fill="#ffe060"/>
+        </svg>
+      </div>
+      <div class="nav-lbl">Home</div>
+    </div>
+    <div class="nav-tile" id="nb-explore" onclick="navTo('explore')">
+      <div class="nav-tile-ico">
+        <svg viewBox="0 0 34 34" fill="none">
+          <rect x="5" y="5" width="24" height="24" rx="3" fill="#e8d090" stroke="#2a1a08" stroke-width="2" transform="rotate(-4 17 17)"/>
+          <ellipse cx="5" cy="17" rx="2.2" ry="8" fill="#d4b870" stroke="#2a1a08" stroke-width="1.5" transform="rotate(-4 5 17)"/>
+          <ellipse cx="29" cy="17" rx="2.2" ry="8" fill="#d4b870" stroke="#2a1a08" stroke-width="1.5" transform="rotate(-4 29 17)"/>
+          <path d="M10 22 Q13 18 17 20 Q21 22 24 17 Q25 14 22 12" stroke="#8a6020" stroke-width="1.2" fill="none" stroke-dasharray="2 2" stroke-linecap="round"/>
+          <line x1="20.5" y1="11" x2="23.5" y2="14" stroke="#c03030" stroke-width="2" stroke-linecap="round"/>
+          <line x1="23.5" y1="11" x2="20.5" y2="14" stroke="#c03030" stroke-width="2" stroke-linecap="round"/>
+          <path d="M9 20 L9 17" stroke="#5a8820" stroke-width="1.5" stroke-linecap="round"/>
+          <ellipse cx="9" cy="16" rx="2.8" ry="2.2" fill="#5a8820"/>
+          <circle cx="27" cy="24" r="3.8" stroke="#a07830" stroke-width="1.2" fill="#f8e8b0"/>
+          <line x1="27" y1="21.2" x2="27" y2="20.2" stroke="#c03030" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="nav-lbl">Explore</div>
+    </div>
+    <div class="nav-tile" id="nb-backpack" onclick="navTo('backpack')">
+      <div class="nav-tile-ico">
+        <svg viewBox="0 0 34 34" fill="none">
+          <rect x="7" y="10" width="20" height="20" rx="6" fill="#c87838" stroke="#2a1a08" stroke-width="2"/>
+          <path d="M12 10 Q12 5.5 17 5.5 Q22 5.5 22 10" stroke="#2a1a08" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <rect x="10" y="19" width="14" height="9" rx="3" fill="#b06828" stroke="#2a1a08" stroke-width="1.5"/>
+          <circle cx="14" cy="23.5" r="1.2" fill="#7a3810"/>
+          <circle cx="17" cy="23.5" r="1.2" fill="#7a3810"/>
+          <circle cx="20" cy="23.5" r="1.2" fill="#7a3810"/>
+          <ellipse cx="22" cy="9.5" rx="1.4" ry="2.2" fill="#f0d030"/>
+          <ellipse cx="22" cy="17.5" rx="1.4" ry="2.2" fill="#f0d030"/>
+          <ellipse cx="18" cy="13.5" rx="2.2" ry="1.4" fill="#f0d030"/>
+          <ellipse cx="26" cy="13.5" rx="2.2" ry="1.4" fill="#f0d030"/>
+          <circle cx="22" cy="13.5" r="2.5" fill="#8a5010" stroke="#2a1a08" stroke-width="1"/>
+          <circle cx="22" cy="13.5" r="1.3" fill="#6a3808"/>
+        </svg>
+      </div>
+      <div class="nav-lbl">Pack</div>
+    </div>
+    <div class="nav-tile" id="nb-settings" onclick="navTo('settings')">
+      <div class="nav-tile-ico">
+        <svg viewBox="0 0 34 34" fill="none">
+          <path d="M14 4 L14 2.5 L20 2.5 L20 4 Q23 5 25 7 L26.5 6 L30 12 L28.5 13 Q29 15 29 17 Q29 19 28.5 21 L30 22 L26.5 28 L25 27 Q23 29 20 30 L20 31.5 L14 31.5 L14 30 Q11 29 9 27 L7.5 28 L4 22 L5.5 21 Q5 19 5 17 Q5 15 5.5 13 L4 12 L7.5 6 L9 7 Q11 5 14 4Z" fill="#5a7838" stroke="#2a1a08" stroke-width="2" stroke-linejoin="round"/>
+          <circle cx="17" cy="17" r="5" fill="#3a5820" stroke="#2a1a08" stroke-width="1.8"/>
+          <path d="M4 12 Q1.5 14.5 2 17 Q1.5 19.5 4 22" stroke="#5a9818" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <ellipse cx="1.2" cy="17" rx="2" ry="1.4" fill="#6aaa20"/>
+          <path d="M30 12 Q32.5 14.5 32 17 Q32.5 19.5 30 22" stroke="#5a9818" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <ellipse cx="32.8" cy="17" rx="2" ry="1.4" fill="#6aaa20"/>
+          <circle cx="17" cy="2" r="2.5" fill="#ff88b0" stroke="#2a1a08" stroke-width="1.2"/>
+          <circle cx="17" cy="2" r="1.2" fill="#ffe060"/>
+        </svg>
+      </div>
+      <div class="nav-lbl">Settings</div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+</div><!-- /home -->
+
+
+<!-- ═══════════════════════════════════════
+     EXPLORE SCREEN
+═══════════════════════════════════════ -->
 <div class="screen" id="screen-explore">
-  <div class="exp-bg"></div>
-  <div class="exp-wrap">
-    <div class="exp-heading">Where to, friend?</div>
-    <div class="exp-sub">The forest holds many paths.<br>Choose wisely — or not at all.</div>
-    <div class="exp-btns">
-      <div class="exp-btn" onclick="toast('Coming soon...')">
-        <div class="exp-btn-ico">🎒</div>
-        <div class="exp-btn-text">
-          <div class="exp-btn-title">Prepare</div>
-          <div class="exp-btn-sub">Rest, craft, and ready yourself before venturing out.</div>
+  <div class="exp-scene">
+    <svg viewBox="0 0 430 780" preserveAspectRatio="xMidYMid slice">
+      <rect width="430" height="780" fill="#2a5010"/>
+      <ellipse cx="215" cy="200" rx="300" ry="300" fill="#3a7020" opacity=".8"/>
+      <ellipse cx="40" cy="400" rx="60" ry="260" fill="#224a0c"/>
+      <ellipse cx="390" cy="390" rx="60" ry="250" fill="#224a0c"/>
+      <ellipse cx="215" cy="700" rx="280" ry="120" fill="#1e3c08"/>
+    </svg>
+  </div>
+  <div class="exp-content">
+    <div class="exp-panel">
+      <div class="exp-panel-header">🌿 Where to, friend?</div>
+      <div class="exp-btn-row">
+        <div class="exp-row-btn" onclick="toast('Coming soon...')">
+          <div class="exp-row-ico brown">🎒</div>
+          <div class="exp-row-text">
+            <div class="exp-row-title">Prepare</div>
+            <div class="exp-row-sub">Rest and craft before venturing out</div>
+          </div>
         </div>
-      </div>
-      <div class="exp-btn" onclick="startBattle()">
-        <div class="exp-btn-ico">⚔️</div>
-        <div class="exp-btn-text">
-          <div class="exp-btn-title">Random Battle</div>
-          <div class="exp-btn-sub">Face a tainted companion in the wild. Can you heal them?</div>
+        <div class="exp-row-btn" onclick="startBattle()">
+          <div class="exp-row-ico gold">⚔️</div>
+          <div class="exp-row-text">
+            <div class="exp-row-title">Random Battle</div>
+            <div class="exp-row-sub">Face a tainted companion — heal them!</div>
+          </div>
         </div>
       </div>
     </div>
   </div>
+  <div class="bottom-nav" id="bottomNavExplore">
+    <div class="nav-tile" id="nb2-home" onclick="navTo('home')">
+      <div class="nav-tile-ico"><svg viewBox="0 0 34 34" fill="none"><path d="M4 19 Q8 10 17 6 Q26 10 30 19Z" fill="#5a8828" stroke="#2a1a08" stroke-width="2"/><rect x="7" y="19" width="20" height="11" rx="2" fill="#c09050" stroke="#2a1a08" stroke-width="2"/><path d="M7 21 Q4 24 5 28" stroke="#4a9818" stroke-width="2" fill="none" stroke-linecap="round"/><ellipse cx="4" cy="25" rx="2.5" ry="1.8" fill="#6ab820"/><circle cx="17" cy="7" r="2.5" fill="#ff88b0" stroke="#2a1a08" stroke-width="1.2"/></svg></div>
+      <div class="nav-lbl">Home</div>
+    </div>
+    <div class="nav-tile on" id="nb2-explore" onclick="navTo('explore')">
+      <div class="nav-tile-ico"><svg viewBox="0 0 34 34" fill="none"><rect x="5" y="5" width="24" height="24" rx="3" fill="#e8d090" stroke="#2a1a08" stroke-width="2" transform="rotate(-4 17 17)"/><line x1="20.5" y1="11" x2="23.5" y2="14" stroke="#c03030" stroke-width="2" stroke-linecap="round"/><line x1="23.5" y1="11" x2="20.5" y2="14" stroke="#c03030" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="nav-lbl">Explore</div>
+    </div>
+    <div class="nav-tile" id="nb2-backpack" onclick="navTo('backpack')">
+      <div class="nav-tile-ico"><svg viewBox="0 0 34 34" fill="none"><rect x="7" y="10" width="20" height="20" rx="6" fill="#c87838" stroke="#2a1a08" stroke-width="2"/><path d="M12 10 Q12 5.5 17 5.5 Q22 5.5 22 10" stroke="#2a1a08" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="22" cy="13.5" r="2.5" fill="#8a5010" stroke="#2a1a08" stroke-width="1"/></svg></div>
+      <div class="nav-lbl">Pack</div>
+    </div>
+    <div class="nav-tile" id="nb2-settings" onclick="navTo('settings')">
+      <div class="nav-tile-ico"><svg viewBox="0 0 34 34" fill="none"><path d="M14 4 L14 2.5 L20 2.5 L20 4 Q23 5 25 7 L26.5 6 L30 12 L28.5 13 Q29 15 29 17 Q29 19 28.5 21 L30 22 L26.5 28 L25 27 Q23 29 20 30 L20 31.5 L14 31.5 L14 30 Q11 29 9 27 L7.5 28 L4 22 L5.5 21 Q5 19 5 17 Q5 15 5.5 13 L4 12 L7.5 6 L9 7 Q11 5 14 4Z" fill="#5a7838" stroke="#2a1a08" stroke-width="2" stroke-linejoin="round"/><circle cx="17" cy="17" r="5" fill="#3a5820" stroke="#2a1a08" stroke-width="1.8"/></svg></div>
+      <div class="nav-lbl">Settings</div>
+    </div>
+  </div>
 </div>
 
-<!-- ══ BATTLE ══ -->
+
+<!-- ═══════════════════════════════════════
+     BATTLE SCREEN
+═══════════════════════════════════════ -->
 <div class="screen" id="screen-battle">
-  <div class="battle-bg">
+  <div class="battle-scene">
     <svg viewBox="0 0 430 500" preserveAspectRatio="xMidYMid slice">
-      <defs>
-        <linearGradient id="bSky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#1a0828"/>
-          <stop offset="60%" stop-color="#2e1040"/>
-          <stop offset="100%" stop-color="#1a2808"/>
-        </linearGradient>
-      </defs>
-      <rect width="430" height="500" fill="url(#bSky)"/>
-      <!-- Eerie moon -->
-      <circle cx="215" cy="60" r="36" fill="#d4b8e0" opacity=".55"/>
-      <circle cx="230" cy="50" r="28" fill="#1a0828"/>
-      <!-- Stars -->
-      <circle cx="40" cy="30" r="1.5" fill="#e0c8f0" opacity=".7"/>
-      <circle cx="390" cy="25" r="1.5" fill="#e0c8f0" opacity=".65"/>
-      <circle cx="120" cy="18" r="1" fill="white" opacity=".6"/>
-      <circle cx="300" cy="22" r="1" fill="white" opacity=".55"/>
-      <circle cx="70" cy="55" r="1" fill="#c0a8e8" opacity=".5"/>
-      <circle cx="355" cy="48" r="1" fill="#c0a8e8" opacity=".5"/>
-      <!-- Dark trees -->
-      <ellipse cx="20" cy="400" rx="40" ry="220" fill="#0e1808"/>
-      <ellipse cx="410" cy="390" rx="42" ry="230" fill="#0e1808"/>
-      <ellipse cx="70" cy="410" rx="30" ry="185" fill="#121e08"/>
-      <ellipse cx="362" cy="405" rx="32" ry="195" fill="#121e08"/>
-      <!-- Ground platform -->
-      <ellipse cx="215" cy="440" rx="200" ry="40" fill="#1a2e08"/>
+      <rect width="430" height="500" fill="#18082e"/>
+      <ellipse cx="215" cy="60" rx="200" ry="180" fill="#22103a" opacity=".9"/>
+      <circle cx="215" cy="55" r="38" fill="#c8a8e0" opacity=".45"/>
+      <circle cx="228" cy="46" r="30" fill="#18082e"/>
+      <circle cx="40" cy="28" r="2" fill="#e0c8f0" opacity=".7"/>
+      <circle cx="390" cy="22" r="2" fill="#e0c8f0" opacity=".65"/>
+      <circle cx="120" cy="16" r="1.5" fill="white" opacity=".55"/>
+      <circle cx="300" cy="20" r="1.5" fill="white" opacity=".5"/>
+      <circle cx="70" cy="50" r="1" fill="#c0a8e8" opacity=".5"/>
+      <ellipse cx="20" cy="380" rx="38" ry="200" fill="#0e1606"/>
+      <ellipse cx="410" cy="370" rx="40" ry="210" fill="#0e1606"/>
+      <ellipse cx="215" cy="440" rx="200" ry="40" fill="#1a2c08"/>
       <rect x="0" y="440" width="430" height="60" fill="#141e06"/>
-      <!-- Eerie vines -->
-      <path d="M60 0 Q55 100 65 200 Q58 260 55 340" stroke="#2a1840" stroke-width="2" fill="none" opacity=".6"/>
-      <path d="M370 0 Q375 105 365 205 Q372 265 374 342" stroke="#2a1840" stroke-width="2" fill="none" opacity=".55"/>
-      <!-- Purple mist ground -->
-      <ellipse cx="215" cy="445" rx="210" ry="20" fill="#4a1860" opacity=".3"/>
+      <ellipse cx="215" cy="445" rx="200" ry="20" fill="#4a1860" opacity=".25"/>
     </svg>
   </div>
   <div class="battle-ui">
     <div class="battle-field">
-      <div class="combatants-row">
-
-        <!-- Player LEFT -->
-        <div class="player-side">
-          <div class="player-sprite" id="playerSprite">
-            <svg width="90" height="115" viewBox="0 0 160 200" fill="none">
-              <ellipse cx="80" cy="193" rx="30" ry="6" fill="rgba(20,60,5,.3)"/>
-              <path d="M108 155 Q134 140 138 118 Q142 98 126 90 Q118 86 114 94 Q110 104 118 110 Q126 116 122 126 Q116 138 104 144Z" fill="#3a7a1a"/>
-              <ellipse cx="60" cy="178" rx="13" ry="8" fill="#2e6a14" transform="rotate(-10 60 178)"/>
-              <ellipse cx="100" cy="180" rx="13" ry="8" fill="#2e6a14" transform="rotate(10 100 180)"/>
-              <ellipse cx="54" cy="185" rx="11" ry="5" fill="#3a8020" transform="rotate(-8 54 185)"/>
-              <ellipse cx="106" cy="186" rx="11" ry="5" fill="#3a8020" transform="rotate(8 106 186)"/>
-              <ellipse cx="80" cy="148" rx="44" ry="46" fill="#3a8020"/>
-              <ellipse cx="68" cy="128" rx="18" ry="14" fill="#4aaa28" opacity=".35"/>
-              <path d="M52 162 Q42 172 44 182" stroke="#2e6a14" stroke-width="13" stroke-linecap="round" fill="none"/>
-              <path d="M108 162 Q118 172 116 182" stroke="#2e6a14" stroke-width="13" stroke-linecap="round" fill="none"/>
-              <ellipse cx="44" cy="184" rx="10" ry="5" fill="#3a8020"/>
-              <ellipse cx="116" cy="184" rx="10" ry="5" fill="#3a8020"/>
-              <ellipse cx="80" cy="108" rx="24" ry="16" fill="#3a8020"/>
-              <ellipse cx="80" cy="82" rx="36" ry="34" fill="#3a8020"/>
-              <path d="M48 60 Q42 30 58 22 Q62 42 56 60Z" fill="#3a8020" stroke="#2a5a10" stroke-width="1.5"/>
-              <path d="M50 58 Q46 36 58 28 Q60 44 56 58Z" fill="#7acc40"/>
-              <path d="M112 60 Q118 30 102 22 Q98 42 104 60Z" fill="#3a8020" stroke="#2a5a10" stroke-width="1.5"/>
-              <path d="M110 58 Q114 36 102 28 Q100 44 104 58Z" fill="#7acc40"/>
-              <ellipse cx="80" cy="90" rx="20" ry="16" fill="#5aaa28"/>
-              <ellipse cx="65" cy="76" rx="11" ry="12" fill="#d8f8a0"/>
-              <ellipse cx="95" cy="76" rx="11" ry="12" fill="#d8f8a0"/>
-              <circle cx="65" cy="78" r="7.5" fill="#1a6008"/>
-              <circle cx="95" cy="78" r="7.5" fill="#1a6008"/>
-              <ellipse cx="65" cy="79" rx="4" ry="6" fill="#0a1e04"/>
-              <ellipse cx="95" cy="79" rx="4" ry="6" fill="#0a1e04"/>
-              <circle cx="68" cy="75" r="2.5" fill="white"/>
-              <circle cx="98" cy="75" r="2.5" fill="white"/>
-              <path d="M78 90 Q80 87 82 90 Q80 93 78 90Z" fill="#1a5008"/>
-              <path d="M75 93 Q80 98 85 93" stroke="#1a5008" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-              <path d="M80 93 L80 96" stroke="#1a5008" stroke-width="1.5" stroke-linecap="round"/>
-              <line x1="38" y1="88" x2="62" y2="92" stroke="#2a6010" stroke-width="1" stroke-linecap="round" opacity=".7"/>
-              <line x1="38" y1="93" x2="62" y2="94" stroke="#2a6010" stroke-width="1" stroke-linecap="round" opacity=".7"/>
-              <line x1="98" y1="92" x2="122" y2="88" stroke="#2a6010" stroke-width="1" stroke-linecap="round" opacity=".7"/>
-              <line x1="98" y1="94" x2="122" y2="93" stroke="#2a6010" stroke-width="1" stroke-linecap="round" opacity=".7"/>
-              <ellipse cx="50" cy="88" rx="8" ry="5" fill="rgba(80,200,40,.3)"/>
-              <ellipse cx="110" cy="88" rx="8" ry="5" fill="rgba(80,200,40,.3)"/>
-              <path d="M80 56 Q85 48 80 42 Q75 48 80 56Z" fill="#7acc40"/>
-            </svg>
+      <!-- Player LEFT -->
+      <div class="player-side-b">
+        <div class="player-plate">
+          <div class="p-bars-side">
+            <div class="p-bar-item">
+              <div class="p-bar-lbl-b">HP</div>
+              <div class="p-bar-track-b"><div class="p-bar-fill-b p-hp-fill" id="pHpBar" style="width:100%"></div></div>
+            </div>
+            <div class="p-bar-item">
+              <div class="p-bar-lbl-b">MP</div>
+              <div class="p-bar-track-b"><div class="p-bar-fill-b p-mp-fill" id="pMpBar" style="width:100%"></div></div>
+            </div>
           </div>
         </div>
-
-        <!-- Enemy RIGHT -->
-        <div class="enemy-side">
-          <div class="enemy-name" id="enemyName">???</div>
-          <div class="enemy-status">Tainted</div>
-          <div class="enemy-hp-wrap">
-            <div class="enemy-hp-track"><div class="enemy-hp-fill" id="enemyHpBar" style="width:100%"></div></div>
-            <div class="enemy-hp-lbl" id="enemyHpLbl">HP: 100 / 100</div>
-          </div>
-          <div class="enemy-sprite" id="enemySprite"></div>
+        <div class="player-sprite-b" id="playerSprite">
+          <svg width="88" height="110" viewBox="0 0 160 200" fill="none">
+            <ellipse cx="80" cy="194" rx="28" ry="6" fill="rgba(0,0,0,.2)"/>
+            <path d="M108 152 Q132 138 136 116 Q140 96 124 88 Q116 84 112 92 Q108 102 116 108 Q124 114 120 124 Q114 136 104 142Z" fill="#2e6a14" stroke="#1a4008" stroke-width="2"/>
+            <ellipse cx="80" cy="148" rx="44" ry="46" fill="#3a8020" stroke="#1a5010" stroke-width="3"/>
+            <ellipse cx="58" cy="179" rx="13" ry="8" fill="#2e6a14" stroke="#1a4008" stroke-width="2"/>
+            <ellipse cx="102" cy="181" rx="13" ry="8" fill="#2e6a14" stroke="#1a4008" stroke-width="2"/>
+            <path d="M50 160 Q40 170 42 182" stroke="#2e6a14" stroke-width="13" stroke-linecap="round" fill="none"/>
+            <path d="M110 160 Q120 170 118 182" stroke="#2e6a14" stroke-width="13" stroke-linecap="round" fill="none"/>
+            <ellipse cx="80" cy="108" rx="24" ry="16" fill="#3a8020" stroke="#1a5010" stroke-width="2.5"/>
+            <ellipse cx="80" cy="82" rx="36" ry="34" fill="#3a8020" stroke="#1a5010" stroke-width="3"/>
+            <path d="M48 62 Q42 32 58 22 Q62 42 56 62Z" fill="#3a8020" stroke="#1a5010" stroke-width="2.5"/>
+            <path d="M50 60 Q46 36 58 28 Q60 44 56 60Z" fill="#7acc40"/>
+            <path d="M112 62 Q118 32 102 22 Q98 42 104 62Z" fill="#3a8020" stroke="#1a5010" stroke-width="2.5"/>
+            <path d="M110 60 Q114 36 102 28 Q100 44 104 60Z" fill="#7acc40"/>
+            <ellipse cx="80" cy="90" rx="20" ry="16" fill="#52a030" stroke="#1a5010" stroke-width="2"/>
+            <ellipse cx="64" cy="76" rx="11" ry="12" fill="#d8f8a0" stroke="#1a5010" stroke-width="2"/>
+            <ellipse cx="96" cy="76" rx="11" ry="12" fill="#d8f8a0" stroke="#1a5010" stroke-width="2"/>
+            <circle cx="64" cy="78" r="7.5" fill="#1a6008"/>
+            <circle cx="96" cy="78" r="7.5" fill="#1a6008"/>
+            <ellipse cx="64" cy="79" rx="4" ry="6" fill="#0a1a04"/>
+            <ellipse cx="96" cy="79" rx="4" ry="6" fill="#0a1a04"/>
+            <circle cx="67" cy="75" r="2.5" fill="white"/>
+            <circle cx="99" cy="75" r="2.5" fill="white"/>
+            <path d="M77 90 Q80 87 83 90 Q80 93 77 90Z" fill="#1a5008"/>
+            <path d="M74 94 Q80 100 86 94" stroke="#1a5008" stroke-width="2" stroke-linecap="round" fill="none"/>
+          </svg>
         </div>
-
+      </div>
+      <!-- Enemy RIGHT -->
+      <div class="enemy-side">
+        <div class="enemy-plate">
+          <div class="enemy-name-lbl" id="enemyName">???</div>
+          <div class="enemy-status-chip">Tainted</div>
+          <div class="e-hp-track"><div class="e-hp-fill" id="enemyHpBar" style="width:100%"></div></div>
+          <div class="e-hp-lbl" id="enemyHpLbl">HP: 100 / 100</div>
+        </div>
+        <div class="enemy-sprite-wrap" id="enemySprite"></div>
       </div>
     </div>
-
-    <!-- HP + MP bars side by side -->
-    <div class="p-bars-row">
-      <div class="p-bar-item">
-        <div class="p-bar-lbl">HP</div>
-        <div class="p-bar-track"><div class="p-bar-fill p-bar-hp" id="pHpBar" style="width:100%"></div></div>
-      </div>
-      <div class="p-bar-item">
-        <div class="p-bar-lbl">MP</div>
-        <div class="p-bar-track"><div class="p-bar-fill p-bar-mp" id="pMpBar" style="width:100%"></div></div>
+    <div class="battle-log-panel" id="battleLog">A tainted companion steps into the clearing...</div>
+    <div class="battle-menu-panel">
+      <div class="b-menu-grid">
+        <button class="b-btn" id="btnAttack" onclick="doAction('attack')"><div class="b-btn-ico">🌿</div><div class="b-btn-lbl">Attack</div></button>
+        <button class="b-btn" id="btnSpecial" onclick="doAction('special')"><div class="b-btn-ico">✨</div><div class="b-btn-lbl">Root Pulse</div></button>
+        <button class="b-btn" id="btnHeal" onclick="doAction('healself')"><div class="b-btn-ico">💧</div><div class="b-btn-lbl">Tend Wounds</div></button>
+        <button class="b-btn" id="btnRetreat" onclick="doAction('retreat')"><div class="b-btn-ico">🍃</div><div class="b-btn-lbl">Retreat</div></button>
       </div>
     </div>
-
-    <!-- Log -->
-    <div class="battle-log" id="battleLog">A tainted companion emerges from the shadows...</div>
-
-    <!-- Menu — no flavor text -->
-    <div class="battle-menu">
-      <div class="menu-grid">
-        <button class="menu-btn" id="btnAttack" onclick="doAction('attack')">
-          <div class="menu-btn-ico">🌿</div>
-          <div class="menu-btn-lbl">Attack</div>
-        </button>
-        <button class="menu-btn" id="btnSpecial" onclick="doAction('special')">
-          <div class="menu-btn-ico">✨</div>
-          <div class="menu-btn-lbl">Root Pulse</div>
-        </button>
-        <button class="menu-btn" id="btnHeal" onclick="doAction('healself')">
-          <div class="menu-btn-ico">💧</div>
-          <div class="menu-btn-lbl">Tend Wounds</div>
-        </button>
-        <button class="menu-btn" id="btnRetreat" onclick="doAction('retreat')">
-          <div class="menu-btn-ico">🍃</div>
-          <div class="menu-btn-lbl">Retreat</div>
-        </button>
-      </div>
-    </div>
-
-    <!-- Victory overlay -->
     <div class="victory-wrap" id="victoryWrap">
-      <div style="font-size:52px" id="vIco">🌸</div>
-      <div class="v-title" id="vTitle">The darkness fades.</div>
-      <div class="v-msg" id="vMsg">The tainted companion blinks slowly, as if waking from a long dream. They look at you — and smile.</div>
+      <div class="v-ico" id="vIco">🌸</div>
+      <div class="v-title" id="vTitle">Free at last!</div>
+      <div class="v-msg" id="vMsg">The darkness fades.</div>
       <div class="v-rewards">
-        <div class="v-reward xp">✦ <span id="xpGain">+0 XP</span></div>
-        <div class="v-reward wd">
-          <svg width="11" height="14" viewBox="0 0 16 20" fill="none"><path d="M8 1 Q14 8 14 12 A6 6 0 0 1 2 12 Q2 8 8 1Z" fill="#4a9ab8"/></svg>
-          <span id="wdGain">+0</span>
-        </div>
+        <div class="v-reward gold-reward">✦ <span id="xpGain">+0 XP</span></div>
+        <div class="v-reward"><svg width="14" height="18" viewBox="0 0 16 20" fill="none"><path d="M8 1 Q14 8 14 12 A6 6 0 0 1 2 12 Q2 8 8 1Z" fill="#4ab8d8"/></svg><span id="wdGain">+0</span></div>
       </div>
-      <button class="btn-continue" onclick="endBattle()">Continue</button>
+      <button class="btn-continue" onclick="endBattle()">Continue!</button>
     </div>
   </div>
 </div>
 
-<!-- ══ FLOATING NAV (outside all screens, overlays everything) ══ -->
-<nav id="floatNav">
-  <button class="nb on" id="nb-home" onclick="navTo('home')">
-    <div class="nb-ico">
-      <svg viewBox="0 0 34 34" fill="none">
-        <path d="M4 19 Q8 10 17 6 Q26 10 30 19Z" fill="#5a8828" stroke="#3a6010" stroke-width="1"/>
-        <rect x="21" y="8" width="4" height="6" rx="1" fill="#7a5828" stroke="#5a3810" stroke-width=".8"/>
-        <path d="M23 8 Q21 4 23 2 Q25 0 24 3" stroke="#c0b098" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".7"/>
-        <rect x="7" y="19" width="20" height="11" rx="2" fill="#a07840" stroke="#7a5020" stroke-width="1"/>
-        <path d="M14 30 L14 24 Q17 22 20 24 L20 30Z" fill="#5a3010" stroke="#3a1808" stroke-width=".8"/>
-        <rect x="8" y="21" width="5" height="5" rx=".5" fill="#b8e0f0" stroke="#7a5020" stroke-width=".8"/>
-        <line x1="10.5" y1="21" x2="10.5" y2="26" stroke="#7a5020" stroke-width=".6"/>
-        <line x1="8" y1="23.5" x2="13" y2="23.5" stroke="#7a5020" stroke-width=".6"/>
-        <path d="M7 20 Q4 23 5 28 Q4 30 6 30" stroke="#4a8818" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-        <ellipse cx="4.5" cy="24" rx="2.2" ry="1.5" fill="#5aa020" opacity=".9"/>
-        <ellipse cx="5.5" cy="29" rx="1.8" ry="1.2" fill="#6ab830" opacity=".85"/>
-        <path d="M27 20 Q30 24 29 28 Q30 30 28 30" stroke="#4a8818" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-        <ellipse cx="29.5" cy="25" rx="2" ry="1.4" fill="#5aa020" opacity=".9"/>
-        <circle cx="17" cy="6.5" r="2.2" fill="#f080b0"/>
-        <circle cx="17" cy="6.5" r="1" fill="#ffe060"/>
-      </svg>
-    </div>
-    <div class="nb-lbl">Home</div>
-  </button>
-  <button class="nb" id="nb-explore" onclick="navTo('explore')">
-    <div class="nb-ico">
-      <svg viewBox="0 0 34 34" fill="none">
-        <rect x="5" y="5" width="24" height="24" rx="3" fill="#e8d090" stroke="#b89040" stroke-width="1.2" transform="rotate(-4 17 17)"/>
-        <ellipse cx="5" cy="17" rx="2" ry="8" fill="#d4b870" stroke="#b89040" stroke-width=".8" transform="rotate(-4 5 17)"/>
-        <ellipse cx="29" cy="17" rx="2" ry="8" fill="#d4b870" stroke="#b89040" stroke-width=".8" transform="rotate(-4 29 17)"/>
-        <path d="M10 22 Q13 18 17 20 Q21 22 24 17 Q25 14 22 12" stroke="#8a6020" stroke-width="1" fill="none" stroke-dasharray="1.5 2" stroke-linecap="round"/>
-        <line x1="21" y1="11" x2="24" y2="14" stroke="#c03030" stroke-width="1.8" stroke-linecap="round"/>
-        <line x1="24" y1="11" x2="21" y2="14" stroke="#c03030" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M9 20 L9 17" stroke="#5a8820" stroke-width="1" stroke-linecap="round"/>
-        <ellipse cx="9" cy="16" rx="2.5" ry="2" fill="#5a8820"/>
-        <circle cx="27" cy="24" r="3.5" stroke="#a07830" stroke-width=".8" fill="#f8e8b0"/>
-        <line x1="27" y1="21.5" x2="27" y2="20.5" stroke="#c03030" stroke-width=".9" stroke-linecap="round"/>
-        <line x1="27" y1="26.5" x2="27" y2="27.5" stroke="#a07830" stroke-width=".8" stroke-linecap="round"/>
-        <line x1="24.5" y1="24" x2="23.5" y2="24" stroke="#a07830" stroke-width=".8" stroke-linecap="round"/>
-        <line x1="29.5" y1="24" x2="30.5" y2="24" stroke="#a07830" stroke-width=".8" stroke-linecap="round"/>
-      </svg>
-    </div>
-    <div class="nb-lbl">Explore</div>
-  </button>
-  <button class="nb" id="nb-backpack" onclick="navTo('backpack')">
-    <div class="nb-ico">
-      <svg viewBox="0 0 34 34" fill="none">
-        <rect x="7" y="10" width="20" height="20" rx="6" fill="#c87838" stroke="#9a5820" stroke-width="1.2"/>
-        <path d="M12 10 Q12 5.5 17 5.5 Q22 5.5 22 10" stroke="#9a5820" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-        <rect x="10" y="19" width="14" height="9" rx="3" fill="#b86828" stroke="#9a5820" stroke-width="1"/>
-        <circle cx="13" cy="23.5" r=".9" fill="#7a3810"/>
-        <circle cx="17" cy="23.5" r=".9" fill="#7a3810"/>
-        <circle cx="21" cy="23.5" r=".9" fill="#7a3810"/>
-        <rect x="15" y="16" width="4" height="3" rx="1" fill="#8a5018" stroke="#6a3810" stroke-width=".7"/>
-        <ellipse cx="22" cy="9.5" rx="1.2" ry="2" fill="#f0d030"/>
-        <ellipse cx="22" cy="17.5" rx="1.2" ry="2" fill="#f0d030"/>
-        <ellipse cx="18" cy="13.5" rx="2" ry="1.2" fill="#f0d030"/>
-        <ellipse cx="26" cy="13.5" rx="2" ry="1.2" fill="#f0d030"/>
-        <ellipse cx="19.2" cy="10.7" rx="1.2" ry="2" fill="#e8c020" transform="rotate(45 19.2 10.7)"/>
-        <ellipse cx="24.8" cy="10.7" rx="1.2" ry="2" fill="#e8c020" transform="rotate(-45 24.8 10.7)"/>
-        <ellipse cx="19.2" cy="16.3" rx="1.2" ry="2" fill="#e8c020" transform="rotate(-45 19.2 16.3)"/>
-        <ellipse cx="24.8" cy="16.3" rx="1.2" ry="2" fill="#e8c020" transform="rotate(45 24.8 16.3)"/>
-        <circle cx="22" cy="13.5" r="2.2" fill="#8a5010"/>
-        <circle cx="22" cy="13.5" r="1.2" fill="#6a3808"/>
-      </svg>
-    </div>
-    <div class="nb-lbl">Backpack</div>
-  </button>
-  <button class="nb" id="nb-settings" onclick="navTo('settings')">
-    <div class="nb-ico">
-      <svg viewBox="0 0 34 34" fill="none">
-        <path d="M14 3.5 L14 2 L20 2 L20 3.5 Q23 4.5 25 6.5 L26.5 5.5 L30.5 12 L29 13 Q29.5 15 29.5 17 Q29.5 19 29 21 L30.5 22 L26.5 28.5 L25 27.5 Q23 29.5 20 30.5 L20 32 L14 32 L14 30.5 Q11 29.5 9 27.5 L7.5 28.5 L3.5 22 L5 21 Q4.5 19 4.5 17 Q4.5 15 5 13 L3.5 12 L7.5 5.5 L9 6.5 Q11 4.5 14 3.5Z" stroke="#6a9830" stroke-width="1.5" fill="#2a4a10" stroke-linejoin="round"/>
-        <circle cx="17" cy="17" r="5" stroke="#6a9830" stroke-width="1.3" fill="#1a3008"/>
-        <path d="M17 14 Q19 17 17 20 Q15 17 17 14Z" fill="#5a8820" opacity=".7"/>
-        <path d="M3.5 12 Q1 14.5 1.5 17 Q1 19.5 3.5 22" stroke="#5a9018" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-        <ellipse cx="1" cy="17" rx="1.8" ry="1.2" fill="#6aaa20" opacity=".9"/>
-        <path d="M30.5 12 Q33 14.5 32.5 17 Q33 19.5 30.5 22" stroke="#5a9018" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-        <ellipse cx="33" cy="17" rx="1.8" ry="1.2" fill="#6aaa20" opacity=".9"/>
-        <circle cx="17" cy="1.5" r="2.2" fill="#f080b0"/>
-        <circle cx="17" cy="1.5" r="1" fill="#ffe060"/>
-      </svg>
-    </div>
-    <div class="nb-lbl">Settings</div>
-  </button>
-</nav>
-</div>
+<!-- Toast (global) -->
+<div class="toast" id="toast2" style="position:fixed;top:54px;left:50%;transform:translateX(-50%) translateY(-6px);background:#2a1a08;color:#f5e0a0;border:2.5px solid #2a1a08;border-radius:99px;padding:7px 20px;font-size:12px;font-weight:900;letter-spacing:.04em;z-index:500;opacity:0;pointer-events:none;transition:all .25s;white-space:nowrap;box-shadow:0 4px 0 rgba(0,0,0,.4);"></div>
 
+</div><!-- /app -->
 <script>
-// ── GLOBAL STATE ──────────────────────────────────────────────────────────
-var G = { water: 0, xp: 0 };
-var cur = 'home';
+var G={water:0,xp:0};
+var cur='home';
+var petTapTimes=[];
 
-// ── UTILS ─────────────────────────────────────────────────────────────────
-function rand(a){ return a[Math.floor(Math.random()*a.length)]; }
-function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function rand(a){return a[Math.floor(Math.random()*a.length)];}
+function randInt(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
 
 function toast(msg){
-  var t = document.getElementById('toast');
-  if(!t) return;
-  t.textContent = msg; t.classList.add('show');
+  var t=document.getElementById('toast2');
+  t.textContent=msg;t.classList.add('show');
+  t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';
   clearTimeout(t._t);
-  t._t = setTimeout(function(){ t.classList.remove('show'); }, 1800);
+  t._t=setTimeout(function(){t.style.opacity='0';t.style.transform='translateX(-50%) translateY(-6px)';},1800);
 }
 
-// ── SPEECH ────────────────────────────────────────────────────────────────
-var IDLE = [
-  "The forest is glad you are here.",
-  "Something rustles nearby... probably friendly.",
-  "I found a new path. We should explore it.",
-  "The sun feels warm today.",
-  "I kept a spot warm for you.",
-  "Do you hear the trees? They are talking about us.",
-  "Stay as long as you like.",
-  "I was just thinking about you.",
-  "The butterflies have been busy today.",
-  "A new flower bloomed near the old log."
-];
-
-var petTapTimes = [];
-
-function spawnHeart(angry){
-  var wrap = document.getElementById('groveWrap');
-  if(!wrap) return;
-  var rect = wrap.getBoundingClientRect();
-  var f = document.createElement('div');
-  f.className = 'heart-floater';
-  f.textContent = angry ? '😠' : ['❤️','💚','💛','🌸','✨'][Math.floor(Math.random()*5)];
-  f.style.left = (rect.left + rect.width/2 - 16 + (Math.random()*40-20))+'px';
-  f.style.top  = (rect.top  + rect.height/3)+'px';
-  document.getElementById('app').appendChild(f);
-  setTimeout(function(){ f.remove(); }, 1000);
-}
-
-function updateWater(){
-  /* water stored in G.water — displayed on Backpack page later */
-}
+function updateWater(){document.getElementById('waterLbl').textContent=G.water;}
 
 function petGrove(){
-  var now = Date.now();
-  petTapTimes = petTapTimes.filter(function(t){ return now - t < 1500; });
+  var now=Date.now();
+  petTapTimes=petTapTimes.filter(function(t){return now-t<1500;});
   petTapTimes.push(now);
+  var w=document.getElementById('groveWrap');
+  w.classList.remove('pop');void w.offsetWidth;w.classList.add('pop');
+  setTimeout(function(){w.classList.remove('pop');},600);
+  var angry=petTapTimes.length>=5;
+  spawnHeart(angry);
+  if(angry)petTapTimes=[];
+}
 
-  var w = document.getElementById('groveWrap');
-  w.classList.remove('pop'); void w.offsetWidth; w.classList.add('pop');
-  setTimeout(function(){ w.classList.remove('pop'); }, 600);
-
-  if(petTapTimes.length >= 5){
-    spawnHeart(true);
-    petTapTimes = [];
-  } else {
-    spawnHeart(false);
-  }
+function spawnHeart(angry){
+  var wrap=document.getElementById('groveWrap');
+  if(!wrap)return;
+  var rect=wrap.getBoundingClientRect();
+  var f=document.createElement('div');
+  f.className='heart-floater';
+  f.textContent=angry?'😠':['❤️','💚','💛','🌸','✨'][Math.floor(Math.random()*5)];
+  f.style.left=(rect.left+rect.width/2-16+(Math.random()*40-20))+'px';
+  f.style.top=(rect.top+rect.height/3)+'px';
+  f.style.position='fixed';
+  document.getElementById('app').appendChild(f);
+  setTimeout(function(){f.remove();},1100);
 }
 
 function spawnMotes(){
-  var c = document.getElementById('motesContainer');
+  var c=document.getElementById('motesContainer');
   for(var i=0;i<10;i++){
     (function(idx){
-      var m = document.createElement('div'); m.className='mote';
-      var sz = 2+Math.random()*3;
-      m.style.cssText = 'width:'+sz+'px;height:'+sz+'px;left:'+(5+Math.random()*90)+'%;bottom:'+(15+Math.random()*55)+'%;animation-duration:'+(5+Math.random()*6)+'s;animation-delay:'+(idx*0.5+Math.random()*1.5)+'s';
+      var m=document.createElement('div');m.className='mote';
+      var sz=2+Math.random()*3;
+      m.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+(5+Math.random()*90)+'%;bottom:'+(20+Math.random()*50)+'%;animation-duration:'+(5+Math.random()*6)+'s;animation-delay:'+(idx*.5+Math.random()*2)+'s';
       c.appendChild(m);
     })(i);
   }
 }
 
-// ── NAV ───────────────────────────────────────────────────────────────────
-var NAV_ITEMS = [
-  { id:'home',     lbl:'Home',     svg: '<svg viewBox="0 0 34 34" fill="none"><path d="M4 19 Q8 10 17 6 Q26 10 30 19Z" fill="#5a8828" stroke="#3a6010" stroke-width="1"/><rect x="21" y="8" width="4" height="6" rx="1" fill="#7a5828" stroke="#5a3810" stroke-width=".8"/><path d="M23 8 Q21 4 23 2 Q25 0 24 3" stroke="#c0b098" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".7"/><rect x="7" y="19" width="20" height="11" rx="2" fill="#a07840" stroke="#7a5020" stroke-width="1"/><path d="M14 30 L14 24 Q17 22 20 24 L20 30Z" fill="#5a3010" stroke="#3a1808" stroke-width=".8"/><rect x="8" y="21" width="5" height="5" rx=".5" fill="#b8e0f0" stroke="#7a5020" stroke-width=".8"/><line x1="10.5" y1="21" x2="10.5" y2="26" stroke="#7a5020" stroke-width=".6"/><line x1="8" y1="23.5" x2="13" y2="23.5" stroke="#7a5020" stroke-width=".6"/><path d="M7 20 Q4 23 5 28 Q4 30 6 30" stroke="#4a8818" stroke-width="1.4" fill="none" stroke-linecap="round"/><ellipse cx="4.5" cy="24" rx="2.2" ry="1.5" fill="#5aa020" opacity=".9"/><ellipse cx="5.5" cy="29" rx="1.8" ry="1.2" fill="#6ab830" opacity=".85"/><path d="M27 20 Q30 24 29 28 Q30 30 28 30" stroke="#4a8818" stroke-width="1.4" fill="none" stroke-linecap="round"/><ellipse cx="29.5" cy="25" rx="2" ry="1.4" fill="#5aa020" opacity=".9"/><circle cx="17" cy="6.5" r="2.2" fill="#f080b0"/><circle cx="17" cy="6.5" r="1" fill="#ffe060"/></svg>' },
-  { id:'explore',  lbl:'Explore',  svg: '<svg viewBox="0 0 34 34" fill="none"><rect x="5" y="5" width="24" height="24" rx="3" fill="#e8d090" stroke="#b89040" stroke-width="1.2" transform="rotate(-4 17 17)"/><ellipse cx="5" cy="17" rx="2" ry="8" fill="#d4b870" stroke="#b89040" stroke-width=".8" transform="rotate(-4 5 17)"/><ellipse cx="29" cy="17" rx="2" ry="8" fill="#d4b870" stroke="#b89040" stroke-width=".8" transform="rotate(-4 29 17)"/><path d="M10 22 Q13 18 17 20 Q21 22 24 17 Q25 14 22 12" stroke="#8a6020" stroke-width="1" fill="none" stroke-dasharray="1.5 2" stroke-linecap="round"/><line x1="21" y1="11" x2="24" y2="14" stroke="#c03030" stroke-width="1.8" stroke-linecap="round"/><line x1="24" y1="11" x2="21" y2="14" stroke="#c03030" stroke-width="1.8" stroke-linecap="round"/><path d="M9 20 L9 17" stroke="#5a8820" stroke-width="1" stroke-linecap="round"/><ellipse cx="9" cy="16" rx="2.5" ry="2" fill="#5a8820"/><circle cx="27" cy="24" r="3.5" stroke="#a07830" stroke-width=".8" fill="#f8e8b0"/><line x1="27" y1="21.5" x2="27" y2="20.5" stroke="#c03030" stroke-width=".9" stroke-linecap="round"/><line x1="27" y1="26.5" x2="27" y2="27.5" stroke="#a07830" stroke-width=".8" stroke-linecap="round"/><line x1="24.5" y1="24" x2="23.5" y2="24" stroke="#a07830" stroke-width=".8" stroke-linecap="round"/><line x1="29.5" y1="24" x2="30.5" y2="24" stroke="#a07830" stroke-width=".8" stroke-linecap="round"/></svg>' },
-  { id:'backpack', lbl:'Pack',     svg: '<svg viewBox="0 0 34 34" fill="none"><rect x="7" y="10" width="20" height="20" rx="6" fill="#c87838" stroke="#9a5820" stroke-width="1.2"/><path d="M12 10 Q12 5.5 17 5.5 Q22 5.5 22 10" stroke="#9a5820" stroke-width="1.8" fill="none" stroke-linecap="round"/><rect x="10" y="19" width="14" height="9" rx="3" fill="#b86828" stroke="#9a5820" stroke-width="1"/><circle cx="13" cy="23.5" r=".9" fill="#7a3810"/><circle cx="17" cy="23.5" r=".9" fill="#7a3810"/><circle cx="21" cy="23.5" r=".9" fill="#7a3810"/><rect x="15" y="16" width="4" height="3" rx="1" fill="#8a5018" stroke="#6a3810" stroke-width=".7"/><ellipse cx="22" cy="9.5" rx="1.2" ry="2" fill="#f0d030"/><ellipse cx="22" cy="17.5" rx="1.2" ry="2" fill="#f0d030"/><ellipse cx="18" cy="13.5" rx="2" ry="1.2" fill="#f0d030"/><ellipse cx="26" cy="13.5" rx="2" ry="1.2" fill="#f0d030"/><ellipse cx="19.2" cy="10.7" rx="1.2" ry="2" fill="#e8c020" transform="rotate(45 19.2 10.7)"/><ellipse cx="24.8" cy="10.7" rx="1.2" ry="2" fill="#e8c020" transform="rotate(-45 24.8 10.7)"/><ellipse cx="19.2" cy="16.3" rx="1.2" ry="2" fill="#e8c020" transform="rotate(-45 19.2 16.3)"/><ellipse cx="24.8" cy="16.3" rx="1.2" ry="2" fill="#e8c020" transform="rotate(45 24.8 16.3)"/><circle cx="22" cy="13.5" r="2.2" fill="#8a5010"/><circle cx="22" cy="13.5" r="1.2" fill="#6a3808"/></svg>' },
-  { id:'settings', lbl:'Settings', svg: '<svg viewBox="0 0 34 34" fill="none"><path d="M14 3.5 L14 2 L20 2 L20 3.5 Q23 4.5 25 6.5 L26.5 5.5 L30.5 12 L29 13 Q29.5 15 29.5 17 Q29.5 19 29 21 L30.5 22 L26.5 28.5 L25 27.5 Q23 29.5 20 30.5 L20 32 L14 32 L14 30.5 Q11 29.5 9 27.5 L7.5 28.5 L3.5 22 L5 21 Q4.5 19 4.5 17 Q4.5 15 5 13 L3.5 12 L7.5 5.5 L9 6.5 Q11 4.5 14 3.5Z" stroke="#6a9830" stroke-width="1.5" fill="#2a4a10" stroke-linejoin="round"/><circle cx="17" cy="17" r="5" stroke="#6a9830" stroke-width="1.3" fill="#1a3008"/><path d="M17 14 Q19 17 17 20 Q15 17 17 14Z" fill="#5a8820" opacity=".7"/><path d="M3.5 12 Q1 14.5 1.5 17 Q1 19.5 3.5 22" stroke="#5a9018" stroke-width="1.5" fill="none" stroke-linecap="round"/><ellipse cx="1" cy="17" rx="1.8" ry="1.2" fill="#6aaa20" opacity=".9"/><path d="M30.5 12 Q33 14.5 32.5 17 Q33 19.5 30.5 22" stroke="#5a9018" stroke-width="1.5" fill="none" stroke-linecap="round"/><ellipse cx="33" cy="17" rx="1.8" ry="1.2" fill="#6aaa20" opacity=".9"/><circle cx="17" cy="1.5" r="2.2" fill="#f080b0"/><circle cx="17" cy="1.5" r="1" fill="#ffe060"/></svg>' }
-];
-
-function initHomeCard(){
-  var card = document.getElementById('homeCard');
-  var grid = document.createElement('div');
-  grid.className = 'home-card-nav';
-  NAV_ITEMS.forEach(function(item){
-    var btn = document.createElement('div');
-    btn.className = 'hc-btn' + (item.id === 'home' ? ' on' : '');
-    btn.id = 'hc-'+item.id;
-    btn.innerHTML = '<div class="hc-btn-ico">'+item.svg+'</div><div class="hc-btn-lbl">'+item.lbl+'</div>';
-    btn.onclick = (function(id){ return function(){ navTo(id); }; })(item.id);
-    grid.appendChild(btn);
-  });
-  card.appendChild(grid);
-}
-
 function navTo(id){
-  if(id==='backpack'||id==='settings'){ toast('Coming soon...'); return; }
-  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
-  document.querySelectorAll('.nb').forEach(function(b){ b.classList.remove('on'); });
+  if(id==='backpack'||id==='settings'){toast('Coming soon!');return;}
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.nav-tile').forEach(function(b){b.classList.remove('on');});
   document.getElementById('screen-'+id).classList.add('active');
-  // highlight both nav bar and home card button
-  var nb = document.getElementById('nb-'+id);
-  if(nb) nb.classList.add('on');
-  var hc = document.getElementById('hc-'+id);
-  if(hc) hc.classList.add('on');
-  cur = id;
+  var nb=document.getElementById('nb-'+id);if(nb)nb.classList.add('on');
+  var nb2=document.getElementById('nb2-'+id);if(nb2)nb2.classList.add('on');
+  cur=id;
 }
 
-// ══════════════════════════════════════════════════════════════════════════
-//  BATTLE SYSTEM
-// ══════════════════════════════════════════════════════════════════════════
-
-// Tainted enemy companions
-var ENEMIES = [
-  {
-    name: "Mossworth",
-    desc: "A mossy little spirit, eyes dim with shadow.",
-    color: "#2a6018",
-    taintColor: "#601880",
-    svg: function(tainted){
-      var c = tainted ? "#6b1fa0" : "#3a7a20";
-      var c2 = tainted ? "#8b3fc0" : "#5a9a38";
-      var ec = tainted ? "#c060f0" : "#e8f6d0";
-      return '<svg width="100" height="120" viewBox="0 0 100 120" fill="none">'
-        +'<ellipse cx="50" cy="114" rx="22" ry="5" fill="rgba(0,0,0,.3)"/>'
-        +'<ellipse cx="50" cy="80" rx="34" ry="40" fill="'+c+'"/>'
-        +'<ellipse cx="50" cy="65" rx="26" ry="28" fill="'+c2+'"/>'
-        +'<ellipse cx="50" cy="52" rx="18" ry="19" fill="'+(tainted?"#9a30c8":"#6aaa38")+'"/>'
-        +'<path d="M50 33 C50 33 43 22 46 13 C48 7 52 11 50 20 C52 11 57 9 59 17 C61 26 50 33 50 33Z" fill="'+(tainted?"#b040e0":"#7ac040")+'"/>'
-        +'<ellipse cx="40" cy="58" rx="8" ry="9" fill="'+ec+'"/>'
-        +'<ellipse cx="60" cy="58" rx="8" ry="9" fill="'+ec+'"/>'
-        +'<circle cx="41" cy="59" r="5" fill="'+(tainted?"#9000c0":"#1a2808")+'"/>'
-        +'<circle cx="61" cy="59" r="5" fill="'+(tainted?"#9000c0":"#1a2808")+'"/>'
-        +'<circle cx="42.5" cy="57.5" r="1.8" fill="white"/>'
-        +'<circle cx="62.5" cy="57.5" r="1.8" fill="white"/>'
-        +(tainted?'<ellipse cx="32" cy="54" rx="5" ry="3.5" fill="rgba(180,0,255,.35)"/><ellipse cx="68" cy="54" rx="5" ry="3.5" fill="rgba(180,0,255,.35)"/>':'<ellipse cx="32" cy="64" rx="5" ry="3.5" fill="rgba(100,180,45,.3)"/><ellipse cx="68" cy="64" rx="5" ry="3.5" fill="rgba(100,180,45,.3)"/>')
-        +'<path d="M42 72 '+(tainted?'Q50 68 58 72':'Q50 78 58 72')+'" stroke="'+(tainted?"#800080":"#2a5010")+'" stroke-width="2.2" stroke-linecap="round" fill="none"/>'
-        +(tainted?'<circle cx="50" cy="40" r="3" fill="#e060ff" opacity=".6"/><circle cx="36" cy="50" r="2" fill="#c040e0" opacity=".5"/><circle cx="64" cy="47" r="2" fill="#c040e0" opacity=".5"/>':'')
-        +'</svg>';
-    }
-  },
-  {
-    name: "Fernwick",
-    desc: "A fern sprite, fronds drooping under a dark curse.",
-    color: "#206030",
-    taintColor: "#404080",
-    svg: function(tainted){
-      var bc = tainted ? "#2a2860" : "#285a20";
-      var mc = tainted ? "#4848a0" : "#3a7828";
-      return '<svg width="100" height="120" viewBox="0 0 100 120" fill="none">'
-        +'<ellipse cx="50" cy="114" rx="20" ry="5" fill="rgba(0,0,0,.3)"/>'
-        +'<rect x="45" y="78" width="10" height="36" rx="5" fill="#3a2008"/>'
-        +'<path d="M45 100 Q34 106 30 114" stroke="#3a2008" stroke-width="7" stroke-linecap="round" fill="none"/>'
-        +'<path d="M55 102 Q64 108 68 115" stroke="#3a2008" stroke-width="7" stroke-linecap="round" fill="none"/>'
-        +'<ellipse cx="50" cy="64" rx="36" ry="42" fill="'+bc+'"/>'
-        +'<ellipse cx="50" cy="52" rx="28" ry="32" fill="'+mc+'"/>'
-        // fern fronds
-        +'<path d="M28 48 Q14 38 16 24 Q22 30 20 38 Q26 32 22 22 Q30 28 28 40 Q32 36 30 26 Q36 34 30 46Z" fill="'+(tainted?"#5858b0":"#3a7820")+'"/>'
-        +'<path d="M72 48 Q86 38 84 24 Q78 30 80 38 Q74 32 78 22 Q70 28 72 40 Q68 36 70 26 Q64 34 70 46Z" fill="'+(tainted?"#5858b0":"#3a7820")+'"/>'
-        +'<ellipse cx="38" cy="58" rx="9" ry="10" fill="#e8f4d0"/>'
-        +'<ellipse cx="62" cy="58" rx="9" ry="10" fill="#e8f4d0"/>'
-        +'<circle cx="39" cy="59" r="5.5" fill="'+(tainted?"#2020a0":"#183008")+'"/>'
-        +'<circle cx="63" cy="59" r="5.5" fill="'+(tainted?"#2020a0":"#183008")+'"/>'
-        +'<circle cx="40.5" cy="57.5" r="2" fill="white"/>'
-        +'<circle cx="64.5" cy="57.5" r="2" fill="white"/>'
-        +'<path d="M41 72 '+(tainted?'Q50 67 59 72':'Q50 79 59 72')+'" stroke="'+(tainted?"#3030a0":"#1a4010")+'" stroke-width="2.5" stroke-linecap="round" fill="none"/>'
-        +(tainted?'<circle cx="50" cy="36" r="4" fill="#6060d0" opacity=".5"/><path d="M34 28 Q50 10 66 28" stroke="#4848a0" stroke-width="1.5" fill="none" opacity=".4"/>':'')
-        +'</svg>';
-    }
-  },
-  {
-    name: "Cindermoss",
-    desc: "A fungi companion, cap darkened with corruption.",
-    color: "#804018",
-    taintColor: "#502040",
-    svg: function(tainted){
-      var capC = tainted ? "#6a1030" : "#d04020";
-      var bodyC = tainted ? "#3a1828" : "#c89060";
-      return '<svg width="100" height="120" viewBox="0 0 100 120" fill="none">'
-        +'<ellipse cx="50" cy="115" rx="20" ry="4" fill="rgba(0,0,0,.3)"/>'
-        +'<ellipse cx="50" cy="100" rx="14" ry="18" fill="'+bodyC+'"/>'
-        +'<ellipse cx="50" cy="82" rx="10" ry="22" fill="'+(tainted?"#501828":"#b87848")+'"/>'
-        // mushroom cap
-        +'<ellipse cx="50" cy="64" rx="38" ry="22" fill="'+capC+'"/>'
-        +'<ellipse cx="50" cy="58" rx="34" ry="20" fill="'+(tainted?"#8a1840":"#e05030")+'"/>'
-        // spots
-        +'<circle cx="38" cy="56" r="4" fill="white" opacity="'+(tainted?".3":".7")+'"/>'
-        +'<circle cx="52" cy="52" r="3" fill="white" opacity="'+(tainted?".25":".65")+'"/>'
-        +'<circle cx="63" cy="57" r="3.5" fill="white" opacity="'+(tainted?".3":".65")+'"/>'
-        // face
-        +'<ellipse cx="41" cy="72" rx="7" ry="8" fill="#f0e8d0"/>'
-        +'<ellipse cx="59" cy="72" rx="7" ry="8" fill="#f0e8d0"/>'
-        +'<circle cx="42" cy="73" r="4.5" fill="'+(tainted?"#800020":"#2a1008")+'"/>'
-        +'<circle cx="60" cy="73" r="4.5" fill="'+(tainted?"#800020":"#2a1008")+'"/>'
-        +'<circle cx="43.5" cy="71.5" r="1.6" fill="white"/>'
-        +'<circle cx="61.5" cy="71.5" r="1.6" fill="white"/>'
-        +'<path d="M43 82 '+(tainted?'Q50 78 57 82':'Q50 87 57 82')+'" stroke="'+(tainted?"#600010":"#3a1808")+'" stroke-width="2.2" stroke-linecap="round" fill="none"/>'
-        +(tainted?'<ellipse cx="50" cy="62" rx="30" ry="12" fill="#800030" opacity=".2"/><circle cx="50" cy="50" r="5" fill="#c00040" opacity=".35"/>':'')
-        +'</svg>';
-    }
-  },
-  {
-    name: "Briarling",
-    desc: "A coral-vine creature, thorns sharpened by bitterness.",
-    color: "#206050",
-    taintColor: "#304860",
-    svg: function(tainted){
-      var cc = tainted ? "#1a3050" : "#20a080";
-      var cc2 = tainted ? "#2a4870" : "#30c090";
-      return '<svg width="100" height="120" viewBox="0 0 100 120" fill="none">'
-        +'<ellipse cx="50" cy="115" rx="22" ry="5" fill="rgba(0,0,0,.3)"/>'
-        +'<rect x="45" y="80" width="10" height="34" rx="5" fill="#2a1808"/>'
-        +'<path d="M45 105 Q36 110 32 115" stroke="#2a1808" stroke-width="7" stroke-linecap="round" fill="none"/>'
-        +'<path d="M55 107 Q62 112 66 116" stroke="#2a1808" stroke-width="7" stroke-linecap="round" fill="none"/>'
-        // coral body
-        +'<ellipse cx="50" cy="65" rx="36" ry="44" fill="'+cc+'"/>'
-        +'<ellipse cx="50" cy="54" rx="28" ry="34" fill="'+cc2+'"/>'
-        // coral branches
-        +'<path d="M26 50 Q14 40 18 26 Q22 32 20 42" stroke="'+(tainted?"#3060a0":"#40c0a0")+'" stroke-width="5" stroke-linecap="round" fill="none"/>'
-        +'<path d="M20 36 Q12 28 16 18" stroke="'+(tainted?"#3060a0":"#40c0a0")+'" stroke-width="4" stroke-linecap="round" fill="none"/>'
-        +'<path d="M74 50 Q86 40 82 26 Q78 32 80 42" stroke="'+(tainted?"#3060a0":"#40c0a0")+'" stroke-width="5" stroke-linecap="round" fill="none"/>'
-        +'<path d="M80 36 Q88 28 84 18" stroke="'+(tainted?"#3060a0":"#40c0a0")+'" stroke-width="4" stroke-linecap="round" fill="none"/>'
-        // eyes
-        +'<ellipse cx="40" cy="60" rx="8" ry="9" fill="#e8f8f0"/>'
-        +'<ellipse cx="60" cy="60" rx="8" ry="9" fill="#e8f8f0"/>'
-        +'<circle cx="41" cy="61" r="5" fill="'+(tainted?"#001840":"#082818")+'"/>'
-        +'<circle cx="61" cy="61" r="5" fill="'+(tainted?"#001840":"#082818")+'"/>'
-        +'<circle cx="42.5" cy="59.5" r="1.8" fill="white"/>'
-        +'<circle cx="62.5" cy="59.5" r="1.8" fill="white"/>'
-        +'<path d="M42 73 '+(tainted?'Q50 68 58 73':'Q50 79 58 73')+'" stroke="'+(tainted?"#002050":"#084830")+'" stroke-width="2.5" stroke-linecap="round" fill="none"/>'
-        +(tainted?'<ellipse cx="50" cy="40" rx="28" ry="16" fill="#002060" opacity=".3"/>':'')
-        +'</svg>';
-    }
-  }
+// ── ENEMIES ───────────────────────────────────────────────────────────────
+var ENEMIES=[
+  {name:"Mossworth",svg:function(t){
+    var c=t?"#6b1fa0":"#3a7a20",c2=t?"#8b3fc0":"#5a9a38",ec=t?"#c060f0":"#e8f6d0";
+    return '<svg width="100" height="120" viewBox="0 0 100 120" fill="none">'
+      +'<ellipse cx="50" cy="114" rx="22" ry="5" fill="rgba(0,0,0,.3)"/>'
+      +'<ellipse cx="50" cy="80" rx="34" ry="40" fill="'+c+'" stroke="#1a0828" stroke-width="2.5"/>'
+      +'<ellipse cx="50" cy="65" rx="26" ry="28" fill="'+c2+'"/>'
+      +'<ellipse cx="50" cy="52" rx="18" ry="19" fill="'+(t?"#9a30c8":"#6aaa38")+'"/>'
+      +'<path d="M50 33 C50 33 43 22 46 13 C48 7 52 11 50 20 C52 11 57 9 59 17 C61 26 50 33 50 33Z" fill="'+(t?"#b040e0":"#7ac040")+'" stroke="#1a0828" stroke-width="1.5"/>'
+      +'<ellipse cx="40" cy="58" rx="8" ry="9" fill="'+ec+'" stroke="#1a0828" stroke-width="1.5"/>'
+      +'<ellipse cx="60" cy="58" rx="8" ry="9" fill="'+ec+'" stroke="#1a0828" stroke-width="1.5"/>'
+      +'<circle cx="41" cy="59" r="5" fill="'+(t?"#9000c0":"#1a2808")+'"/>'
+      +'<circle cx="61" cy="59" r="5" fill="'+(t?"#9000c0":"#1a2808")+'"/>'
+      +'<circle cx="42.5" cy="57.5" r="1.8" fill="white"/>'
+      +'<circle cx="62.5" cy="57.5" r="1.8" fill="white"/>'
+      +(t?'<ellipse cx="32" cy="54" rx="5" ry="3.5" fill="rgba(180,0,255,.4)"/><ellipse cx="68" cy="54" rx="5" ry="3.5" fill="rgba(180,0,255,.4)"/>':'')
+      +'<path d="M42 72 '+(t?'Q50 68 58 72':'Q50 78 58 72')+'" stroke="'+(t?"#800080":"#2a5010")+'" stroke-width="2.5" stroke-linecap="round" fill="none"/>'
+      +(t?'<circle cx="50" cy="38" r="4" fill="#e060ff" opacity=".7"/>':'')
+      +'</svg>';
+  }},
+  {name:"Fernwick",svg:function(t){
+    var bc=t?"#2a2860":"#285a20",mc=t?"#4848a0":"#3a7828";
+    return '<svg width="100" height="120" viewBox="0 0 100 120" fill="none">'
+      +'<ellipse cx="50" cy="114" rx="20" ry="5" fill="rgba(0,0,0,.3)"/>'
+      +'<rect x="45" y="78" width="10" height="36" rx="5" fill="#3a2008" stroke="#1a0808" stroke-width="2"/>'
+      +'<path d="M45 100 Q34 106 30 114" stroke="#3a2008" stroke-width="7" stroke-linecap="round" fill="none"/>'
+      +'<path d="M55 102 Q64 108 68 115" stroke="#3a2008" stroke-width="7" stroke-linecap="round" fill="none"/>'
+      +'<ellipse cx="50" cy="64" rx="36" ry="42" fill="'+bc+'" stroke="#0a0820" stroke-width="2.5"/>'
+      +'<ellipse cx="50" cy="52" rx="28" ry="32" fill="'+mc+'"/>'
+      +'<path d="M28 48 Q14 38 16 24 Q22 30 20 38 Q26 32 22 22 Q30 28 28 40Z" fill="'+(t?"#5858b0":"#3a7820")+'" stroke="#0a0820" stroke-width="1.5"/>'
+      +'<path d="M72 48 Q86 38 84 24 Q78 30 80 38 Q74 32 78 22 Q70 28 72 40Z" fill="'+(t?"#5858b0":"#3a7820")+'" stroke="#0a0820" stroke-width="1.5"/>'
+      +'<ellipse cx="38" cy="58" rx="9" ry="10" fill="#e8f4d0" stroke="#0a0820" stroke-width="1.5"/>'
+      +'<ellipse cx="62" cy="58" rx="9" ry="10" fill="#e8f4d0" stroke="#0a0820" stroke-width="1.5"/>'
+      +'<circle cx="39" cy="59" r="5.5" fill="'+(t?"#2020a0":"#183008")+'"/>'
+      +'<circle cx="63" cy="59" r="5.5" fill="'+(t?"#2020a0":"#183008")+'"/>'
+      +'<circle cx="40.5" cy="57.5" r="2" fill="white"/>'
+      +'<circle cx="64.5" cy="57.5" r="2" fill="white"/>'
+      +'<path d="M41 72 '+(t?'Q50 67 59 72':'Q50 79 59 72')+'" stroke="'+(t?"#3030a0":"#1a4010")+'" stroke-width="2.5" stroke-linecap="round" fill="none"/>'
+      +(t?'<circle cx="50" cy="36" r="4" fill="#6060d0" opacity=".7"/>':'')
+      +'</svg>';
+  }},
+  {name:"Cindermoss",svg:function(t){
+    var capC=t?"#6a1030":"#d04020",bodyC=t?"#3a1828":"#c89060";
+    return '<svg width="100" height="120" viewBox="0 0 100 120" fill="none">'
+      +'<ellipse cx="50" cy="115" rx="20" ry="4" fill="rgba(0,0,0,.3)"/>'
+      +'<ellipse cx="50" cy="100" rx="14" ry="18" fill="'+bodyC+'" stroke="#1a0808" stroke-width="2"/>'
+      +'<ellipse cx="50" cy="82" rx="10" ry="22" fill="'+(t?"#501828":"#b87848")+'" stroke="#1a0808" stroke-width="1.5"/>'
+      +'<ellipse cx="50" cy="64" rx="38" ry="22" fill="'+capC+'" stroke="#1a0808" stroke-width="2.5"/>'
+      +'<ellipse cx="50" cy="58" rx="34" ry="20" fill="'+(t?"#8a1840":"#e05030")+'"/>'
+      +'<circle cx="38" cy="56" r="4" fill="white" opacity="'+(t?".3":".75")+'"/>'
+      +'<circle cx="52" cy="52" r="3" fill="white" opacity="'+(t?".25":".7")+'"/>'
+      +'<circle cx="63" cy="57" r="3.5" fill="white" opacity="'+(t?".3":".7")+'"/>'
+      +'<ellipse cx="41" cy="72" rx="7" ry="8" fill="#f0e8d0" stroke="#1a0808" stroke-width="1.5"/>'
+      +'<ellipse cx="59" cy="72" rx="7" ry="8" fill="#f0e8d0" stroke="#1a0808" stroke-width="1.5"/>'
+      +'<circle cx="42" cy="73" r="4.5" fill="'+(t?"#800020":"#2a1008")+'"/>'
+      +'<circle cx="60" cy="73" r="4.5" fill="'+(t?"#800020":"#2a1008")+'"/>'
+      +'<circle cx="43.5" cy="71.5" r="1.6" fill="white"/>'
+      +'<circle cx="61.5" cy="71.5" r="1.6" fill="white"/>'
+      +'<path d="M43 82 '+(t?'Q50 78 57 82':'Q50 87 57 82')+'" stroke="'+(t?"#600010":"#3a1808")+'" stroke-width="2.2" stroke-linecap="round" fill="none"/>'
+      +(t?'<circle cx="50" cy="50" r="5" fill="#c00040" opacity=".5"/>':'')
+      +'</svg>';
+  }},
+  {name:"Briarling",svg:function(t){
+    var cc=t?"#1a3050":"#20a080",cc2=t?"#2a4870":"#30c090";
+    return '<svg width="100" height="120" viewBox="0 0 100 120" fill="none">'
+      +'<ellipse cx="50" cy="115" rx="22" ry="5" fill="rgba(0,0,0,.3)"/>'
+      +'<rect x="45" y="80" width="10" height="34" rx="5" fill="#2a1808" stroke="#0a0808" stroke-width="2"/>'
+      +'<path d="M45 105 Q36 110 32 115" stroke="#2a1808" stroke-width="7" stroke-linecap="round" fill="none"/>'
+      +'<path d="M55 107 Q62 112 66 116" stroke="#2a1808" stroke-width="7" stroke-linecap="round" fill="none"/>'
+      +'<ellipse cx="50" cy="65" rx="36" ry="44" fill="'+cc+'" stroke="#08180a" stroke-width="2.5"/>'
+      +'<ellipse cx="50" cy="54" rx="28" ry="34" fill="'+cc2+'"/>'
+      +'<path d="M26 50 Q14 40 18 26 Q22 32 20 42" stroke="'+(t?"#3060a0":"#40c0a0")+'" stroke-width="6" stroke-linecap="round" fill="none"/>'
+      +'<path d="M74 50 Q86 40 82 26 Q78 32 80 42" stroke="'+(t?"#3060a0":"#40c0a0")+'" stroke-width="6" stroke-linecap="round" fill="none"/>'
+      +'<ellipse cx="40" cy="60" rx="8" ry="9" fill="#e8f8f0" stroke="#08180a" stroke-width="1.5"/>'
+      +'<ellipse cx="60" cy="60" rx="8" ry="9" fill="#e8f8f0" stroke="#08180a" stroke-width="1.5"/>'
+      +'<circle cx="41" cy="61" r="5" fill="'+(t?"#001840":"#082818")+'"/>'
+      +'<circle cx="61" cy="61" r="5" fill="'+(t?"#001840":"#082818")+'"/>'
+      +'<circle cx="42.5" cy="59.5" r="1.8" fill="white"/>'
+      +'<circle cx="62.5" cy="59.5" r="1.8" fill="white"/>'
+      +'<path d="M42 73 '+(t?'Q50 68 58 73':'Q50 79 58 73')+'" stroke="'+(t?"#002050":"#084830")+'" stroke-width="2.5" stroke-linecap="round" fill="none"/>'
+      +(t?'<ellipse cx="50" cy="40" rx="26" ry="14" fill="#002060" opacity=".35"/>':'')
+      +'</svg>';
+  }}
 ];
 
-// Battle state
-var B = {
-  enemy: null,
-  eHp: 0, eMaxHp: 0,
-  pHp: 100, pMaxHp: 100,
-  pMp: 100, pMaxMp: 100,
-  phase: 0, // 0=normal, 1=victory, 2=defeated
-  busy: false,
-  turnCount: 0
-};
-
-// Attack / action lines
-var ATTACK_LINES = [
-  "Grove sends out a wave of roots!",
-  "Grove strikes with a vine whip!",
-  "Grove hurls a cluster of seeds!",
-  "Grove channels forest energy into a blow!"
-];
-var SPECIAL_LINES = [
-  "Grove pulses with ancient root energy!",
-  "The forest answers Grove's call!",
-  "Grove reaches deep into the earth and unleashes a burst of life!",
-  "Grove's leaves shimmer and release a brilliant pulse!"
-];
-var ENEMY_ATTACK_LINES = [
-  "The tainted spirit lashes out with dark tendrils!",
-  "A wave of corrupted energy washes over Grove!",
-  "The creature's eyes flash purple as it strikes!",
-  "Dark thorns fly from the tainted one!"
-];
-var HEAL_LINES = [
-  "Grove draws on the forest's warmth to recover.",
-  "A gentle rain of spores soothes Grove's wounds.",
-  "Grove roots briefly into the earth and heals.",
-  "The forest breathes life back into Grove."
-];
-var FINAL_HEAL_LINES = [
-  "Grove reaches out with open hands and channels pure light into the darkness...",
-  "Grove presses both palms forward — warmth floods the battlefield...",
-  "Grove whispers an ancient forest word and the corruption begins to shatter...",
-  "With everything they have, Grove sends a wave of pure love into the tainted one..."
-];
+var B={enemy:null,eHp:0,eMaxHp:0,pHp:100,pMaxHp:100,pMp:100,pMaxMp:100,phase:0,busy:false};
+var ATTACK_LINES=["Grove sends a wave of roots!","Grove strikes with a vine whip!","Grove hurls a cluster of seeds!","Grove channels forest energy!"];
+var SPECIAL_LINES=["Grove pulses with ancient root energy!","The forest answers Grove's call!","Grove unleashes a burst of pure life!","Grove's leaves shimmer and release a pulse!"];
+var ENEMY_LINES=["The tainted spirit lashes out with dark tendrils!","A wave of corrupted energy washes over Grove!","The creature's eyes flash as it strikes!","Dark thorns fly from the tainted one!"];
+var HEAL_LINES=["Grove draws on the forest's warmth to recover.","A gentle rain of spores soothes Grove's wounds.","Grove roots into the earth and heals.","The forest breathes life back into Grove."];
+var FINAL_LINES=["Grove reaches out and channels pure light into the darkness...","Grove whispers an ancient word — the corruption begins to shatter...","With everything they have, Grove sends pure love into the tainted one..."];
 
 function startBattle(){
-  B.enemy = ENEMIES[Math.floor(Math.random()*ENEMIES.length)];
-  B.eMaxHp = randInt(60,100);
-  B.eHp = B.eMaxHp;
-  B.pHp = 100; B.pMaxHp = 100;
-  B.pMp = 100; B.pMaxMp = 100;
-  B.phase = 0; B.busy = false; B.turnCount = 0;
-
+  B.enemy=ENEMIES[Math.floor(Math.random()*ENEMIES.length)];
+  B.eMaxHp=randInt(60,100);B.eHp=B.eMaxHp;
+  B.pHp=100;B.pMaxHp=100;B.pMp=100;B.pMaxMp=100;
+  B.phase=0;B.busy=false;
   document.getElementById('victoryWrap').classList.remove('show');
-  document.getElementById('enemyName').textContent = B.enemy.name;
-  document.getElementById('enemySprite').innerHTML = B.enemy.svg(true);
-
+  document.getElementById('enemyName').textContent=B.enemy.name;
+  document.getElementById('enemySprite').innerHTML=B.enemy.svg(true);
   setMenuEnabled(true);
   updateBattleBars();
-  setLog(B.enemy.name+' emerges from the shadows. Their eyes glow purple with a tainted light...');
-
-  // Switch screen
-  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
-  document.querySelectorAll('.nb').forEach(function(b){ b.classList.remove('on'); });
+  setLog(B.enemy.name+' steps into the clearing, eyes glowing with a tainted light...');
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.nav-tile').forEach(function(b){b.classList.remove('on');});
   document.getElementById('screen-battle').classList.add('active');
-  cur = 'battle';
+  cur='battle';
 }
 
 function updateBattleBars(){
-  var ePct = Math.max(0, B.eHp/B.eMaxHp*100);
-  var pHpPct = Math.max(0, B.pHp/B.pMaxHp*100);
-  var pMpPct = Math.max(0, B.pMp/B.pMaxMp*100);
-  document.getElementById('enemyHpBar').style.width = ePct+'%';
-  document.getElementById('enemyHpLbl').textContent = 'HP: '+Math.max(0,B.eHp)+' / '+B.eMaxHp;
-  document.getElementById('pHpBar').style.width = pHpPct+'%';
-  document.getElementById('pMpBar').style.width = pMpPct+'%';
+  document.getElementById('enemyHpBar').style.width=Math.max(0,B.eHp/B.eMaxHp*100)+'%';
+  document.getElementById('enemyHpLbl').textContent='HP: '+Math.max(0,B.eHp)+' / '+B.eMaxHp;
+  document.getElementById('pHpBar').style.width=Math.max(0,B.pHp/B.pMaxHp*100)+'%';
+  document.getElementById('pMpBar').style.width=Math.max(0,B.pMp/B.pMaxMp*100)+'%';
 }
+function setLog(m){document.getElementById('battleLog').textContent=m;}
+function setMenuEnabled(on){['btnAttack','btnSpecial','btnHeal','btnRetreat'].forEach(function(id){document.getElementById(id).disabled=!on;});}
 
-function setLog(msg){
-  document.getElementById('battleLog').textContent = msg;
-}
-
-function setMenuEnabled(on){
-  ['btnAttack','btnSpecial','btnHeal','btnRetreat'].forEach(function(id){
-    document.getElementById(id).disabled = !on;
-  });
-}
-
-function spawnFloater(text, type, targetId){
-  var el = document.getElementById(targetId);
-  if(!el) return;
-  var rect = el.getBoundingClientRect();
-  var f = document.createElement('div');
-  f.className = 'floater '+type;
-  f.textContent = text;
-  f.style.left = (rect.left + rect.width/2 - 20)+'px';
-  f.style.top = (rect.top + rect.height/2 - 20)+'px';
+function spawnFloater(text,type,targetId){
+  var el=document.getElementById(targetId);if(!el)return;
+  var rect=el.getBoundingClientRect();
+  var f=document.createElement('div');f.className='floater '+type;f.textContent=text;
+  f.style.left=(rect.left+rect.width/2-20)+'px';f.style.top=(rect.top+rect.height/2-20)+'px';
+  f.style.position='fixed';
   document.getElementById('app').appendChild(f);
-  setTimeout(function(){ f.remove(); }, 950);
+  setTimeout(function(){f.remove();},950);
 }
-
-function animEl(id, cls){
-  var el = document.getElementById(id);
-  if(!el) return;
-  el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls);
-  setTimeout(function(){ el.classList.remove(cls); }, 600);
+function animEl(id,cls){
+  var el=document.getElementById(id);if(!el)return;
+  el.classList.remove(cls);void el.offsetWidth;el.classList.add(cls);
+  setTimeout(function(){el.classList.remove(cls);},600);
 }
 
 function doAction(type){
-  if(B.busy || B.phase !== 0) return;
-  B.busy = true;
-  setMenuEnabled(false);
-  B.turnCount++;
-
-  if(type === 'retreat'){
-    setLog('Grove retreats gracefully into the undergrowth. "We\'ll try again."');
-    setTimeout(function(){
-      navTo('explore');
-    }, 1500);
-    return;
+  if(B.busy||B.phase!==0)return;
+  B.busy=true;setMenuEnabled(false);
+  if(type==='retreat'){
+    setLog('Grove retreats gracefully. "We\'ll try again."');
+    setTimeout(function(){navTo('explore');},1500);return;
   }
-
-  // Player action
-  if(type === 'attack'){
-    var dmg = randInt(10,22);
-    B.eHp -= dmg;
-    setLog(rand(ATTACK_LINES)+' (-'+dmg+' HP)');
+  if(type==='attack'){
+    var dmg=randInt(10,22);B.eHp-=dmg;
+    setLog(rand(ATTACK_LINES)+' (-'+dmg+')');
     animEl('playerSprite','attack');
-    setTimeout(function(){ animEl('enemySprite','hit'); spawnFloater('-'+dmg,'dmg','enemySprite'); updateBattleBars(); }, 350);
-
-  } else if(type === 'special'){
-    if(B.pMp < 20){
-      setLog('Not enough energy for Root Pulse...');
-      B.busy = false; setMenuEnabled(true); return;
-    }
-    var dmg2 = randInt(22,40);
-    B.pMp -= 20;
-    B.eHp -= dmg2;
-    setLog(rand(SPECIAL_LINES)+' (-'+dmg2+' HP)');
+    setTimeout(function(){animEl('enemySprite','hit');spawnFloater('-'+dmg,'dmg','enemySprite');updateBattleBars();},350);
+  } else if(type==='special'){
+    if(B.pMp<20){setLog('Not enough energy for Root Pulse...');B.busy=false;setMenuEnabled(true);return;}
+    var dmg2=randInt(22,40);B.pMp-=20;B.eHp-=dmg2;
+    setLog(rand(SPECIAL_LINES)+' (-'+dmg2+')');
     animEl('playerSprite','attack');
-    setTimeout(function(){ animEl('enemySprite','hit'); spawnFloater('-'+dmg2,'special','enemySprite'); updateBattleBars(); }, 350);
-
-  } else if(type === 'healself'){
-    var healAmt = randInt(15,28);
-    B.pHp = Math.min(B.pMaxHp, B.pHp + healAmt);
-    setLog(rand(HEAL_LINES)+' (+'+healAmt+' HP)');
-    spawnFloater('+'+healAmt,'heal','playerSprite');
-    updateBattleBars();
+    setTimeout(function(){animEl('enemySprite','hit');spawnFloater('-'+dmg2,'special','enemySprite');updateBattleBars();},350);
+  } else if(type==='healself'){
+    var h=randInt(15,28);B.pHp=Math.min(B.pMaxHp,B.pHp+h);
+    setLog(rand(HEAL_LINES)+' (+'+h+')');
+    spawnFloater('+'+h,'heal','playerSprite');updateBattleBars();
   }
-
-  // Check if enemy is low enough to trigger final heal
   setTimeout(function(){
-    if(B.eHp <= Math.ceil(B.eMaxHp * 0.2) && B.phase === 0){
-      // Final healing move
-      B.phase = 1;
-      setMenuEnabled(false);
-      setLog(rand(FINAL_HEAL_LINES));
+    if(B.eHp<=Math.ceil(B.eMaxHp*.2)&&B.phase===0){
+      B.phase=1;setMenuEnabled(false);
+      setLog(rand(FINAL_LINES));
       animEl('playerSprite','attack');
       setTimeout(function(){
-        // Enemy heals and is freed
-        B.eHp = B.eMaxHp;
-        updateBattleBars();
+        B.eHp=B.eMaxHp;updateBattleBars();
         animEl('enemySprite','heal');
         spawnFloater('✨','special','enemySprite');
-        document.getElementById('enemySprite').innerHTML = B.enemy.svg(false);
-        setTimeout(function(){
-          showVictory();
-        }, 1200);
-      }, 1000);
-      return;
+        document.getElementById('enemySprite').innerHTML=B.enemy.svg(false);
+        setTimeout(function(){showVictory();},1200);
+      },1000);return;
     }
-
-    // Enemy turn
-    if(B.phase === 0 && B.eHp > 0){
+    if(B.phase===0&&B.eHp>0){
       setTimeout(function(){
-        var eDmg = randInt(8,18);
-        B.pHp = Math.max(0, B.pHp - eDmg);
-        setLog(rand(ENEMY_ATTACK_LINES)+' (-'+eDmg+' HP)');
+        var ed=randInt(8,18);B.pHp=Math.max(0,B.pHp-ed);
+        setLog(rand(ENEMY_LINES)+' (-'+ed+')');
         animEl('enemySprite','hit');
         setTimeout(function(){
-          spawnFloater('-'+eDmg,'dmg','playerSprite');
-          updateBattleBars();
-          // Check player defeat
-          if(B.pHp <= 0){
-            setLog('Grove collapses... "It\'s okay. We tried. We\'ll come back."');
-            setTimeout(function(){ navTo('explore'); }, 2200);
-            return;
-          }
-          B.busy = false;
-          setMenuEnabled(true);
-        }, 300);
-      }, 700);
-    } else {
-      B.busy = false;
-      if(B.phase === 0) setMenuEnabled(true);
-    }
-  }, 700);
+          spawnFloater('-'+ed,'dmg','playerSprite');updateBattleBars();
+          if(B.pHp<=0){setLog('Grove collapses... "It\'s okay. We\'ll come back."');setTimeout(function(){navTo('explore');},2200);return;}
+          B.busy=false;setMenuEnabled(true);
+        },300);
+      },700);
+    } else {B.busy=false;if(B.phase===0)setMenuEnabled(true);}
+  },700);
 }
 
 function showVictory(){
-  var xpEarned = randInt(15,50);
-  var wdEarned = randInt(3,12);
-  G.water += wdEarned;
-  G.xp += xpEarned;
-  updateWater();
-  document.getElementById('vTitle').textContent = B.enemy.name+' is free.';
-  document.getElementById('vMsg').textContent = 'The darkness fades. '+B.enemy.name+' blinks slowly, as if waking from a long dream. They look at you — and smile.';
-  document.getElementById('xpGain').textContent = '+'+xpEarned+' XP';
-  document.getElementById('wdGain').textContent = '+'+wdEarned;
+  var xp=randInt(15,50),wd=randInt(3,12);
+  G.water+=wd;G.xp+=xp;updateWater();
+  document.getElementById('vTitle').textContent=B.enemy.name+' is free!';
+  document.getElementById('vMsg').textContent='The darkness fades. '+B.enemy.name+' blinks slowly, as if waking from a long dream. They look at you — and smile.';
+  document.getElementById('xpGain').textContent='+'+xp+' XP';
+  document.getElementById('wdGain').textContent='+'+wd;
   document.getElementById('victoryWrap').classList.add('show');
 }
+function endBattle(){document.getElementById('victoryWrap').classList.remove('show');navTo('explore');}
 
-function endBattle(){
-  document.getElementById('victoryWrap').classList.remove('show');
-  navTo('explore');
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────
 spawnMotes();
 updateWater();
 </script>
