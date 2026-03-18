@@ -37,78 +37,97 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a3408;font-family:
 
 .home-ui{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;pointer-events:none;}
 
-/* Vertical bars — top left */
-.v-bars{
-  position:absolute;
-  top:calc(var(--safe-top)+18px);
-  left:16px;
-  display:flex;flex-direction:row;align-items:flex-start;gap:8px;
-  pointer-events:none;
-}
-.v-bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;}
-.v-bar-ico{font-size:14px;line-height:1;}
-.v-bar-track{
-  width:10px;height:90px;
-  background:rgba(0,0,0,.35);
-  border-radius:99px;overflow:hidden;
-  border:1px solid rgba(255,255,255,.1);
-  display:flex;flex-direction:column;justify-content:flex-end;
-}
-.v-bar-fill{width:100%;border-radius:99px;transition:height .7s ease;}
-.v-bar-hp{background:linear-gradient(0deg,#b02020,#e84040);}
-.v-bar-en{background:linear-gradient(0deg,#b08010,#e8c030);}
-/* Energy bar sits 12px lower for visual offset */
-.v-bar-col.en-col{margin-top:12px;}
-
-/* Companion name floating top-centre */
-.comp-name{
-  position:absolute;
-  top:calc(var(--safe-top)+18px);
-  left:50%;transform:translateX(-50%);
-  font-family:'Spectral',serif;font-size:22px;font-weight:600;
-  color:#d8f0a8;letter-spacing:.06em;
-  text-shadow:0 2px 10px rgba(0,0,0,.55);
-  pointer-events:none;white-space:nowrap;
-}
-
-/* Grove — bigger, sits higher */
+/* Grove — 3x size, fills upper portion of screen */
 .grove-center{
   flex:1;display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  padding-bottom:0;padding-top:30px;
+  padding-top:20px;padding-bottom:0;
   pointer-events:all;
 }
-.grove-svg-wrap{cursor:pointer;animation:g-float 4s ease-in-out infinite;filter:drop-shadow(0 14px 32px rgba(20,80,10,.6));}
-@keyframes g-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.grove-svg-wrap{
+  cursor:pointer;
+  animation:g-float 4s ease-in-out infinite;
+  filter:drop-shadow(0 18px 40px rgba(20,80,10,.65));
+}
+@keyframes g-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
 .grove-svg-wrap.pop{animation:g-pop .5s ease forwards;}
-@keyframes g-pop{0%{transform:translateY(0) scale(1)}30%{transform:translateY(-20px) scale(1.1)}65%{transform:translateY(2px) scale(.97)}85%{transform:translateY(-5px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
+@keyframes g-pop{
+  0%{transform:translateY(0) scale(1)}
+  30%{transform:translateY(-22px) scale(1.08)}
+  65%{transform:translateY(3px) scale(.97)}
+  85%{transform:translateY(-6px) scale(1.02)}
+  100%{transform:translateY(0) scale(1)}
+}
 
-/* Heart floater from companion tap */
+/* Heart floater */
 .heart-floater{
   position:absolute;
-  font-size:26px;pointer-events:none;z-index:30;
-  animation:heart-rise .9s ease forwards;
+  font-size:30px;pointer-events:none;z-index:30;
+  animation:heart-rise 1s ease forwards;
 }
-@keyframes heart-rise{0%{opacity:1;transform:translateY(0) scale(1)}60%{opacity:.8;transform:translateY(-50px) scale(1.2)}100%{opacity:0;transform:translateY(-90px) scale(.7)}}
+@keyframes heart-rise{
+  0%{opacity:1;transform:translateY(0) scale(1)}
+  60%{opacity:.8;transform:translateY(-60px) scale(1.25)}
+  100%{opacity:0;transform:translateY(-110px) scale(.6)}
+}
 
-/* Floating info card — sits above nav, centred */
+/* Horizontal bars — centred, above the nav card */
+.h-bars{
+  position:absolute;
+  bottom:calc(16px + 88px + 16px); /* nav-card height + gap */
+  left:50%;transform:translateX(-50%);
+  width:calc(100% - 80px);max-width:280px;
+  display:flex;flex-direction:column;gap:7px;
+  pointer-events:none;
+}
+.h-bar-row{display:flex;align-items:center;gap:8px;}
+.h-bar-ico{font-size:14px;flex-shrink:0;width:18px;text-align:center;}
+.h-bar-track{
+  flex:1;height:9px;
+  background:rgba(0,0,0,.38);
+  border-radius:99px;overflow:hidden;
+  border:1px solid rgba(255,255,255,.12);
+}
+.h-bar-fill{height:100%;border-radius:99px;transition:width .7s ease;}
+.h-bar-hp{background:linear-gradient(90deg,#b02020,#e84040);}
+.h-bar-en{background:linear-gradient(90deg,#b08010,#e8c030);}
+
+/* Floating nav card — does NOT touch sides or bottom */
 .home-card{
   position:absolute;
-  bottom:14px;
+  bottom:16px;
   left:50%;transform:translateX(-50%);
-  width:calc(100% - 32px);max-width:360px;
-  background:rgba(20,40,8,.78);
-  border:1.5px solid rgba(140,200,80,.35);
-  border-radius:20px;
-  padding:14px 18px 14px;
-  backdrop-filter:blur(8px);
+  width:calc(100% - 48px);max-width:320px;
+  background:rgba(12,28,5,.82);
+  border:1.5px solid rgba(140,200,80,.38);
+  border-radius:24px;
+  padding:14px 16px;
+  backdrop-filter:blur(12px);
   pointer-events:all;
-  display:flex;flex-direction:column;gap:8px;
+  box-shadow:0 8px 32px rgba(0,0,0,.35);
 }
-.home-card-name{
-  font-family:'Spectral',serif;font-size:18px;font-weight:600;
-  color:#d8f0a8;text-align:center;letter-spacing:.05em;
+
+/* Home card nav buttons grid */
+.home-card-nav{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:6px;
 }
+.hc-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;padding:10px 4px;
+  background:rgba(255,255,255,.06);
+  border:1.5px solid rgba(140,200,80,.2);
+  border-radius:16px;
+  cursor:pointer;
+  transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.hc-btn:active{transform:scale(.92);background:rgba(140,200,80,.14);}
+.hc-btn.on{border-color:rgba(140,200,80,.55);background:rgba(140,200,80,.12);}
+.hc-btn-ico{width:30px;height:30px;}
+.hc-btn-ico svg{width:30px;height:30px;}
+.hc-btn-lbl{font-size:9px;font-weight:900;color:#7aaa48;letter-spacing:.05em;text-transform:uppercase;}
+.hc-btn.on .hc-btn-lbl{color:#c8f060;}
 
 .toast{position:absolute;top:52px;left:50%;transform:translateX(-50%) translateY(-6px);background:rgba(6,14,3,.92);color:#c8f07a;border-radius:99px;padding:6px 18px;font-size:11px;font-weight:800;letter-spacing:.06em;z-index:20;opacity:0;pointer-events:none;transition:all .25s;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -352,21 +371,10 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a3408;font-family:
   </div>
   <div id="motesContainer"></div>
   <div class="home-ui">
-    <!-- Vertical bars top-left -->
-    <div class="v-bars">
-      <div class="v-bar-col">
-        <div class="v-bar-ico">&#10084;&#65039;</div>
-        <div class="v-bar-track"><div class="v-bar-fill v-bar-hp" id="hpBar" style="height:80%"></div></div>
-      </div>
-      <div class="v-bar-col en-col">
-        <div class="v-bar-ico">&#9889;</div>
-        <div class="v-bar-track"><div class="v-bar-fill v-bar-en" id="enBar" style="height:65%"></div></div>
-      </div>
-    </div>
-    <!-- Grove — bigger, centred, higher -->
+    <!-- Grove — 3x size, centred -->
     <div class="grove-center">
       <div class="grove-svg-wrap" id="groveWrap" onclick="petGrove()">
-        <svg width="155" height="195" viewBox="0 0 130 195" fill="none">
+        <svg width="390" height="490" viewBox="0 0 130 195" fill="none">
           <ellipse cx="65" cy="189" rx="29" ry="6" fill="rgba(30,80,10,.4)"/>
           <rect x="59" y="130" width="12" height="59" rx="6" fill="#3e2808"/>
           <path d="M59 165 Q44 172 40 184" stroke="#3e2808" stroke-width="9" stroke-linecap="round" fill="none"/>
@@ -400,9 +408,22 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a3408;font-family:
         </svg>
       </div>
     </div>
-    <!-- Floating info card -->
-    <div class="home-card">
-      <div class="home-card-name">Grove</div>
+
+    <!-- Horizontal HP / Energy bars centred above card -->
+    <div class="h-bars">
+      <div class="h-bar-row">
+        <div class="h-bar-ico">&#10084;&#65039;</div>
+        <div class="h-bar-track"><div class="h-bar-fill h-bar-hp" id="hpBar" style="width:80%"></div></div>
+      </div>
+      <div class="h-bar-row">
+        <div class="h-bar-ico">&#9889;</div>
+        <div class="h-bar-track"><div class="h-bar-fill h-bar-en" id="enBar" style="width:65%"></div></div>
+      </div>
+    </div>
+
+    <!-- Floating nav card — not touching sides or bottom -->
+    <div class="home-card" id="homeCard">
+      <!-- nav icons injected by JS to keep DRY -->
     </div>
   </div>
 </div>
@@ -774,12 +795,38 @@ function spawnMotes(){
 }
 
 // ── NAV ───────────────────────────────────────────────────────────────────
+var NAV_ITEMS = [
+  { id:'home',     lbl:'Home',     svg: '<svg viewBox="0 0 34 34" fill="none"><path d="M4 19 Q8 10 17 6 Q26 10 30 19Z" fill="#5a8828" stroke="#3a6010" stroke-width="1"/><rect x="21" y="8" width="4" height="6" rx="1" fill="#7a5828" stroke="#5a3810" stroke-width=".8"/><path d="M23 8 Q21 4 23 2 Q25 0 24 3" stroke="#c0b098" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".7"/><rect x="7" y="19" width="20" height="11" rx="2" fill="#a07840" stroke="#7a5020" stroke-width="1"/><path d="M14 30 L14 24 Q17 22 20 24 L20 30Z" fill="#5a3010" stroke="#3a1808" stroke-width=".8"/><rect x="8" y="21" width="5" height="5" rx=".5" fill="#b8e0f0" stroke="#7a5020" stroke-width=".8"/><line x1="10.5" y1="21" x2="10.5" y2="26" stroke="#7a5020" stroke-width=".6"/><line x1="8" y1="23.5" x2="13" y2="23.5" stroke="#7a5020" stroke-width=".6"/><path d="M7 20 Q4 23 5 28 Q4 30 6 30" stroke="#4a8818" stroke-width="1.4" fill="none" stroke-linecap="round"/><ellipse cx="4.5" cy="24" rx="2.2" ry="1.5" fill="#5aa020" opacity=".9"/><ellipse cx="5.5" cy="29" rx="1.8" ry="1.2" fill="#6ab830" opacity=".85"/><path d="M27 20 Q30 24 29 28 Q30 30 28 30" stroke="#4a8818" stroke-width="1.4" fill="none" stroke-linecap="round"/><ellipse cx="29.5" cy="25" rx="2" ry="1.4" fill="#5aa020" opacity=".9"/><circle cx="17" cy="6.5" r="2.2" fill="#f080b0"/><circle cx="17" cy="6.5" r="1" fill="#ffe060"/></svg>' },
+  { id:'explore',  lbl:'Explore',  svg: '<svg viewBox="0 0 34 34" fill="none"><rect x="5" y="5" width="24" height="24" rx="3" fill="#e8d090" stroke="#b89040" stroke-width="1.2" transform="rotate(-4 17 17)"/><ellipse cx="5" cy="17" rx="2" ry="8" fill="#d4b870" stroke="#b89040" stroke-width=".8" transform="rotate(-4 5 17)"/><ellipse cx="29" cy="17" rx="2" ry="8" fill="#d4b870" stroke="#b89040" stroke-width=".8" transform="rotate(-4 29 17)"/><path d="M10 22 Q13 18 17 20 Q21 22 24 17 Q25 14 22 12" stroke="#8a6020" stroke-width="1" fill="none" stroke-dasharray="1.5 2" stroke-linecap="round"/><line x1="21" y1="11" x2="24" y2="14" stroke="#c03030" stroke-width="1.8" stroke-linecap="round"/><line x1="24" y1="11" x2="21" y2="14" stroke="#c03030" stroke-width="1.8" stroke-linecap="round"/><path d="M9 20 L9 17" stroke="#5a8820" stroke-width="1" stroke-linecap="round"/><ellipse cx="9" cy="16" rx="2.5" ry="2" fill="#5a8820"/><circle cx="27" cy="24" r="3.5" stroke="#a07830" stroke-width=".8" fill="#f8e8b0"/><line x1="27" y1="21.5" x2="27" y2="20.5" stroke="#c03030" stroke-width=".9" stroke-linecap="round"/><line x1="27" y1="26.5" x2="27" y2="27.5" stroke="#a07830" stroke-width=".8" stroke-linecap="round"/><line x1="24.5" y1="24" x2="23.5" y2="24" stroke="#a07830" stroke-width=".8" stroke-linecap="round"/><line x1="29.5" y1="24" x2="30.5" y2="24" stroke="#a07830" stroke-width=".8" stroke-linecap="round"/></svg>' },
+  { id:'backpack', lbl:'Pack',     svg: '<svg viewBox="0 0 34 34" fill="none"><rect x="7" y="10" width="20" height="20" rx="6" fill="#c87838" stroke="#9a5820" stroke-width="1.2"/><path d="M12 10 Q12 5.5 17 5.5 Q22 5.5 22 10" stroke="#9a5820" stroke-width="1.8" fill="none" stroke-linecap="round"/><rect x="10" y="19" width="14" height="9" rx="3" fill="#b86828" stroke="#9a5820" stroke-width="1"/><circle cx="13" cy="23.5" r=".9" fill="#7a3810"/><circle cx="17" cy="23.5" r=".9" fill="#7a3810"/><circle cx="21" cy="23.5" r=".9" fill="#7a3810"/><rect x="15" y="16" width="4" height="3" rx="1" fill="#8a5018" stroke="#6a3810" stroke-width=".7"/><ellipse cx="22" cy="9.5" rx="1.2" ry="2" fill="#f0d030"/><ellipse cx="22" cy="17.5" rx="1.2" ry="2" fill="#f0d030"/><ellipse cx="18" cy="13.5" rx="2" ry="1.2" fill="#f0d030"/><ellipse cx="26" cy="13.5" rx="2" ry="1.2" fill="#f0d030"/><ellipse cx="19.2" cy="10.7" rx="1.2" ry="2" fill="#e8c020" transform="rotate(45 19.2 10.7)"/><ellipse cx="24.8" cy="10.7" rx="1.2" ry="2" fill="#e8c020" transform="rotate(-45 24.8 10.7)"/><ellipse cx="19.2" cy="16.3" rx="1.2" ry="2" fill="#e8c020" transform="rotate(-45 19.2 16.3)"/><ellipse cx="24.8" cy="16.3" rx="1.2" ry="2" fill="#e8c020" transform="rotate(45 24.8 16.3)"/><circle cx="22" cy="13.5" r="2.2" fill="#8a5010"/><circle cx="22" cy="13.5" r="1.2" fill="#6a3808"/></svg>' },
+  { id:'settings', lbl:'Settings', svg: '<svg viewBox="0 0 34 34" fill="none"><path d="M14 3.5 L14 2 L20 2 L20 3.5 Q23 4.5 25 6.5 L26.5 5.5 L30.5 12 L29 13 Q29.5 15 29.5 17 Q29.5 19 29 21 L30.5 22 L26.5 28.5 L25 27.5 Q23 29.5 20 30.5 L20 32 L14 32 L14 30.5 Q11 29.5 9 27.5 L7.5 28.5 L3.5 22 L5 21 Q4.5 19 4.5 17 Q4.5 15 5 13 L3.5 12 L7.5 5.5 L9 6.5 Q11 4.5 14 3.5Z" stroke="#6a9830" stroke-width="1.5" fill="#2a4a10" stroke-linejoin="round"/><circle cx="17" cy="17" r="5" stroke="#6a9830" stroke-width="1.3" fill="#1a3008"/><path d="M17 14 Q19 17 17 20 Q15 17 17 14Z" fill="#5a8820" opacity=".7"/><path d="M3.5 12 Q1 14.5 1.5 17 Q1 19.5 3.5 22" stroke="#5a9018" stroke-width="1.5" fill="none" stroke-linecap="round"/><ellipse cx="1" cy="17" rx="1.8" ry="1.2" fill="#6aaa20" opacity=".9"/><path d="M30.5 12 Q33 14.5 32.5 17 Q33 19.5 30.5 22" stroke="#5a9018" stroke-width="1.5" fill="none" stroke-linecap="round"/><ellipse cx="33" cy="17" rx="1.8" ry="1.2" fill="#6aaa20" opacity=".9"/><circle cx="17" cy="1.5" r="2.2" fill="#f080b0"/><circle cx="17" cy="1.5" r="1" fill="#ffe060"/></svg>' }
+];
+
+function initHomeCard(){
+  var card = document.getElementById('homeCard');
+  var grid = document.createElement('div');
+  grid.className = 'home-card-nav';
+  NAV_ITEMS.forEach(function(item){
+    var btn = document.createElement('div');
+    btn.className = 'hc-btn' + (item.id === 'home' ? ' on' : '');
+    btn.id = 'hc-'+item.id;
+    btn.innerHTML = '<div class="hc-btn-ico">'+item.svg+'</div><div class="hc-btn-lbl">'+item.lbl+'</div>';
+    btn.onclick = (function(id){ return function(){ navTo(id); }; })(item.id);
+    grid.appendChild(btn);
+  });
+  card.appendChild(grid);
+}
+
 function navTo(id){
   if(id==='backpack'||id==='settings'){ toast('Coming soon...'); return; }
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
-  document.querySelectorAll('.nb').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelectorAll('.nb, .hc-btn').forEach(function(b){ b.classList.remove('on'); });
   document.getElementById('screen-'+id).classList.add('active');
-  document.getElementById('nb-'+id).classList.add('on');
+  // highlight both nav bar and home card button
+  var nb = document.getElementById('nb-'+id);
+  if(nb) nb.classList.add('on');
+  var hc = document.getElementById('hc-'+id);
+  if(hc) hc.classList.add('on');
   cur = id;
 }
 
@@ -1129,6 +1176,7 @@ function endBattle(){
 // ── INIT ──────────────────────────────────────────────────────────────────
 spawnMotes();
 updateWater();
+initHomeCard();
 </script>
 </body>
 </html>
