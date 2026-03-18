@@ -122,7 +122,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:#2a5010;font-family:
 .grove-area{
   position:absolute;
   left:50%;transform:translateX(-50%);
-  bottom:calc(var(--safe-bottom) + 78px + 16px + 52px);
+  bottom:calc(var(--safe-bottom) + 86px + 52px);
   z-index:10;
   cursor:pointer;
   animation:g-float 3.5s ease-in-out infinite;
@@ -139,7 +139,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:#2a5010;font-family:
 /* Big action button */
 .action-btn-wrap{
   position:absolute;
-  bottom:calc(var(--safe-bottom) + 78px + 16px);
+  bottom:calc(var(--safe-bottom) + 86px + 10px);
   left:50%;transform:translateX(-50%);
   z-index:20;width:220px;
 }
@@ -167,15 +167,12 @@ html,body{height:100%;width:100%;overflow:hidden;background:#2a5010;font-family:
 /* BOTTOM NAV */
 .bottom-nav{
   position:absolute;
-  bottom:calc(var(--safe-bottom) + 8px);
-  left:50%;transform:translateX(-50%);
+  bottom:0;left:0;right:0;
   z-index:20;
-  width:92%;max-width:400px;
   background:var(--panel-bg);
-  border:3px solid var(--outline);
-  border-radius:18px;
-  padding:6px;
-  box-shadow:0 5px 0 var(--panel-shadow), 0 5px 0 2px var(--outline);
+  border-top:3px solid var(--outline);
+  border-radius:0;
+  padding:6px 6px calc(6px + var(--safe-bottom));
   display:flex;gap:5px;
 }
 .nav-tile{
