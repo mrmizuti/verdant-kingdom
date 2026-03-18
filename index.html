@@ -74,7 +74,7 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a3408;font-family:
 /* Horizontal bars — centred, above the nav card */
 .h-bars{
   position:absolute;
-  bottom:calc(16px + 88px + 16px); /* nav-card height + gap */
+  bottom:calc(14px + var(--safe-bottom) + 76px + 20px);
   left:50%;transform:translateX(-50%);
   width:calc(100% - 80px);max-width:280px;
   display:flex;flex-direction:column;gap:7px;
@@ -92,18 +92,18 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a3408;font-family:
 .h-bar-hp{background:linear-gradient(90deg,#b02020,#e84040);}
 .h-bar-en{background:linear-gradient(90deg,#b08010,#e8c030);}
 
-/* Floating nav card — does NOT touch sides or bottom */
+/* Floating nav card — does NOT touch sides or bottom, sits above global nav */
 .home-card{
   position:absolute;
-  bottom:16px;
+  bottom:calc(14px + var(--safe-bottom) + 76px);
   left:50%;transform:translateX(-50%);
-  width:calc(100% - 48px);max-width:320px;
+  width:90%;max-width:400px;
   background:rgba(12,28,5,.82);
   border:1.5px solid rgba(140,200,80,.38);
   border-radius:24px;
   padding:14px 16px;
   backdrop-filter:blur(12px);
-  pointer-events:all;
+  pointer-events:none;
   box-shadow:0 8px 32px rgba(0,0,0,.35);
 }
 
@@ -269,21 +269,35 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a3408;font-family:
 /* ══════════════════════════════
    NAV BAR  — brighter & whimsical
 ══════════════════════════════ */
-.nav-bar{
-  flex-shrink:0;display:flex;align-items:stretch;
-  background:linear-gradient(180deg,#2a5010 0%,#1e3c0a 100%);
-  border-top:2px solid #5a9830;
-  padding-bottom:var(--safe-bottom);
-  z-index:10;position:relative;
+/* ── FLOATING NAV (overlays all screens) ── */
+#floatNav{
+  position:fixed;
+  bottom:calc(14px + var(--safe-bottom));
+  left:50%;transform:translateX(-50%);
+  width:90%;max-width:400px;
+  z-index:200;
+  background:rgba(12,28,5,.88);
+  border:1.5px solid rgba(140,200,80,.42);
+  border-radius:26px;
+  padding:8px 10px;
+  backdrop-filter:blur(14px);
+  box-shadow:0 8px 32px rgba(0,0,0,.45);
+  display:flex;align-items:stretch;gap:4px;
 }
-.nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px 4px 7px;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all .15s;}
-.nb:active{transform:scale(.88);}
-.nb-ico{width:34px;height:34px;display:flex;align-items:center;justify-content:center;position:relative;}
-.nb-ico svg{width:34px;height:34px;}
-.nb-lbl{font-size:9px;font-weight:900;color:#7aaa48;letter-spacing:.05em;text-transform:uppercase;transition:color .15s;}
+.nb{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:3px;padding:8px 4px 7px;
+  background:none;border:none;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:all .15s;border-radius:18px;
+}
+.nb:active{transform:scale(.88);background:rgba(140,200,80,.1);}
+.nb.on{background:rgba(140,200,80,.14);}
+.nb-ico{width:32px;height:32px;display:flex;align-items:center;justify-content:center;}
+.nb-ico svg{width:32px;height:32px;}
+.nb-lbl{font-size:9px;font-weight:900;color:#6a9a38;letter-spacing:.05em;text-transform:uppercase;transition:color .15s;}
 .nb.on .nb-lbl{color:#c8f060;}
-/* active pip */
-.nb.on::after{content:'';position:absolute;bottom:calc(var(--safe-bottom) + 2px);width:20px;height:3px;background:#8aba40;border-radius:99px;}
 </style>
 </head>
 <body>
@@ -374,37 +388,84 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a3408;font-family:
     <!-- Grove — 3x size, centred -->
     <div class="grove-center">
       <div class="grove-svg-wrap" id="groveWrap" onclick="petGrove()">
-        <svg width="390" height="490" viewBox="0 0 130 195" fill="none">
-          <ellipse cx="65" cy="189" rx="29" ry="6" fill="rgba(30,80,10,.4)"/>
-          <rect x="59" y="130" width="12" height="59" rx="6" fill="#3e2808"/>
-          <path d="M59 165 Q44 172 40 184" stroke="#3e2808" stroke-width="9" stroke-linecap="round" fill="none"/>
-          <path d="M71 168 Q84 175 88 185" stroke="#3e2808" stroke-width="9" stroke-linecap="round" fill="none"/>
-          <path d="M30 112 Q18 98 22 84" stroke="#3e2808" stroke-width="8" stroke-linecap="round" fill="none"/>
-          <path d="M100 112 Q112 98 108 84" stroke="#3e2808" stroke-width="8" stroke-linecap="round" fill="none"/>
-          <ellipse cx="65" cy="100" rx="46" ry="54" fill="#2a4c16"/>
-          <ellipse cx="65" cy="88" rx="37" ry="43" fill="#396420"/>
-          <ellipse cx="65" cy="77" rx="27" ry="31" fill="#4a7a2c"/>
-          <ellipse cx="65" cy="67" rx="19" ry="21" fill="#5a9234"/>
-          <path d="M65 45 C65 45 55 29 59 17 C62 8 68 13 65 25 C68 13 75 10 78 20 C81 31 65 45 65 45Z" fill="#74b83a"/>
-          <path d="M47 74 C47 74 30 72 26 58 C23 48 31 46 37 54 C31 46 36 38 44 48 C50 56 47 74 47 74Z" fill="#468224"/>
-          <path d="M83 74 C83 74 100 72 104 58 C107 48 99 46 93 54 C99 46 94 38 86 48 C80 56 83 74 83 74Z" fill="#468224"/>
-          <ellipse cx="52" cy="78" rx="11" ry="13" fill="#eaf6d4"/>
-          <ellipse cx="78" cy="78" rx="11" ry="13" fill="#eaf6d4"/>
-          <ellipse cx="52" cy="80" rx="8" ry="9" fill="#367214"/>
-          <ellipse cx="78" cy="80" rx="8" ry="9" fill="#367214"/>
-          <circle cx="53" cy="80" r="5" fill="#182406"/>
-          <circle cx="79" cy="80" r="5" fill="#182406"/>
-          <circle cx="54.5" cy="78.5" r="1.8" fill="white"/>
-          <circle cx="80.5" cy="78.5" r="1.8" fill="white"/>
-          <ellipse cx="65" cy="91" rx="4" ry="2.5" fill="#325610"/>
-          <path d="M56 100 Q65 108 74 100" stroke="#325610" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-          <ellipse cx="40" cy="94" rx="7" ry="5" fill="rgba(100,180,45,.32)"/>
-          <ellipse cx="90" cy="94" rx="7" ry="5" fill="rgba(100,180,45,.32)"/>
-          <circle cx="47" cy="64" r="3" fill="#92c848" opacity=".5"/>
-          <circle cx="83" cy="59" r="2.5" fill="#82b838" opacity=".46"/>
-          <circle cx="65" cy="55" r="2" fill="#a8d858" opacity=".58"/>
-          <circle cx="25" cy="100" r="2" fill="#82b838" opacity=".38"/>
-          <circle cx="105" cy="102" r="2" fill="#82b838" opacity=".38"/>
+        <svg width="390" height="490" viewBox="0 0 160 200" fill="none">
+          <!-- Shadow -->
+          <ellipse cx="80" cy="193" rx="36" ry="7" fill="rgba(20,60,5,.35)"/>
+          <!-- Tail — long, curling leaf-shaped -->
+          <path d="M108 155 Q138 140 142 118 Q146 96 130 88 Q122 84 118 92 Q114 102 122 108 Q130 114 126 124 Q120 136 106 142Z" fill="#3a7a1a" stroke="#2a5a10" stroke-width="1.5"/>
+          <path d="M120 96 Q128 100 124 110" stroke="#4a9a28" stroke-width="1" fill="none" stroke-linecap="round" opacity=".6"/>
+          <!-- Hind legs -->
+          <ellipse cx="60" cy="178" rx="14" ry="9" fill="#2e6a14" transform="rotate(-10 60 178)"/>
+          <ellipse cx="100" cy="180" rx="14" ry="9" fill="#2e6a14" transform="rotate(10 100 180)"/>
+          <!-- Hind paws — leaf shaped -->
+          <ellipse cx="54" cy="185" rx="12" ry="6" fill="#3a8020" transform="rotate(-8 54 185)"/>
+          <ellipse cx="106" cy="186" rx="12" ry="6" fill="#3a8020" transform="rotate(8 106 186)"/>
+          <!-- Toe lines -->
+          <path d="M48 186 Q51 189 54 186" stroke="#2a6010" stroke-width="1" fill="none"/>
+          <path d="M100 187 Q104 190 108 187" stroke="#2a6010" stroke-width="1" fill="none"/>
+          <!-- Body — rounded, leaf-textured -->
+          <ellipse cx="80" cy="148" rx="44" ry="46" fill="#3a8020"/>
+          <!-- Leaf vein overlay on body -->
+          <path d="M80 108 Q80 148 80 186" stroke="#4aaa28" stroke-width="1.5" fill="none" opacity=".3"/>
+          <path d="M60 120 Q80 132 100 120" stroke="#4aaa28" stroke-width="1" fill="none" opacity=".25"/>
+          <path d="M55 138 Q80 148 105 138" stroke="#4aaa28" stroke-width="1" fill="none" opacity=".25"/>
+          <!-- Body highlight -->
+          <ellipse cx="68" cy="128" rx="18" ry="14" fill="#4aaa28" opacity=".35"/>
+          <!-- Front legs -->
+          <path d="M52 162 Q42 172 44 182" stroke="#2e6a14" stroke-width="14" stroke-linecap="round" fill="none"/>
+          <path d="M108 162 Q118 172 116 182" stroke="#2e6a14" stroke-width="14" stroke-linecap="round" fill="none"/>
+          <!-- Front paws -->
+          <ellipse cx="44" cy="184" rx="11" ry="6" fill="#3a8020" transform="rotate(-5 44 184)"/>
+          <ellipse cx="116" cy="184" rx="11" ry="6" fill="#3a8020" transform="rotate(5 116 184)"/>
+          <path d="M38 184 Q41 187 44 184" stroke="#2a6010" stroke-width="1" fill="none"/>
+          <path d="M110 184 Q114 187 118 184" stroke="#2a6010" stroke-width="1" fill="none"/>
+          <!-- Neck -->
+          <ellipse cx="80" cy="108" rx="24" ry="16" fill="#3a8020"/>
+          <!-- Head — round like a cat -->
+          <ellipse cx="80" cy="82" rx="36" ry="34" fill="#3a8020"/>
+          <!-- Leaf ears — large, pointed, with inner lighter leaf -->
+          <path d="M48 60 Q42 30 58 22 Q62 42 56 60Z" fill="#3a8020" stroke="#2a5a10" stroke-width="1.5"/>
+          <path d="M50 58 Q46 36 58 28 Q60 44 56 58Z" fill="#7acc40"/>
+          <path d="M112 60 Q118 30 102 22 Q98 42 104 60Z" fill="#3a8020" stroke="#2a5a10" stroke-width="1.5"/>
+          <path d="M110 58 Q114 36 102 28 Q100 44 104 58Z" fill="#7acc40"/>
+          <!-- Ear tufts (tiny leaf sprig) -->
+          <path d="M54 24 Q52 18 56 14 Q58 20 54 24Z" fill="#5aba28"/>
+          <path d="M106 24 Q108 18 104 14 Q102 20 106 24Z" fill="#5aba28"/>
+          <!-- Face — lighter muzzle -->
+          <ellipse cx="80" cy="90" rx="20" ry="16" fill="#5aaa28"/>
+          <!-- Eyes — large, round, Pokémon-style -->
+          <ellipse cx="65" cy="76" rx="11" ry="12" fill="#d8f8a0"/>
+          <ellipse cx="95" cy="76" rx="11" ry="12" fill="#d8f8a0"/>
+          <!-- Iris -->
+          <circle cx="65" cy="78" r="7.5" fill="#1a6008"/>
+          <circle cx="95" cy="78" r="7.5" fill="#1a6008"/>
+          <!-- Pupil -->
+          <ellipse cx="65" cy="79" rx="4" ry="6" fill="#0a1e04"/>
+          <ellipse cx="95" cy="79" rx="4" ry="6" fill="#0a1e04"/>
+          <!-- Eye shine -->
+          <circle cx="68" cy="75" r="2.5" fill="white"/>
+          <circle cx="98" cy="75" r="2.5" fill="white"/>
+          <circle cx="62" cy="80" r="1.2" fill="white" opacity=".6"/>
+          <circle cx="92" cy="80" r="1.2" fill="white" opacity=".6"/>
+          <!-- Cat nose — tiny leaf shape -->
+          <path d="M78 90 Q80 87 82 90 Q80 93 78 90Z" fill="#1a5008"/>
+          <!-- Cat mouth -->
+          <path d="M75 93 Q80 98 85 93" stroke="#1a5008" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+          <path d="M80 93 L80 96" stroke="#1a5008" stroke-width="1.5" stroke-linecap="round"/>
+          <!-- Whiskers — thin vine-like -->
+          <line x1="38" y1="88" x2="62" y2="92" stroke="#2a6010" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+          <line x1="38" y1="93" x2="62" y2="94" stroke="#2a6010" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+          <line x1="98" y1="92" x2="122" y2="88" stroke="#2a6010" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+          <line x1="98" y1="94" x2="122" y2="93" stroke="#2a6010" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+          <!-- Cheek blush — leaf tinted -->
+          <ellipse cx="50" cy="88" rx="8" ry="5" fill="rgba(80,200,40,.3)"/>
+          <ellipse cx="110" cy="88" rx="8" ry="5" fill="rgba(80,200,40,.3)"/>
+          <!-- Forehead leaf marking -->
+          <path d="M80 56 Q85 48 80 42 Q75 48 80 56Z" fill="#7acc40"/>
+          <path d="M80 56 L80 44" stroke="#5aba28" stroke-width="1" fill="none"/>
+          <!-- Small leaf sprigs on body -->
+          <path d="M42 130 Q36 122 40 114 Q46 120 42 130Z" fill="#5aba28"/>
+          <path d="M118 126 Q124 118 120 110 Q114 116 118 126Z" fill="#5aba28"/>
         </svg>
       </div>
     </div>
@@ -421,10 +482,8 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a3408;font-family:
       </div>
     </div>
 
-    <!-- Floating nav card — not touching sides or bottom -->
-    <div class="home-card" id="homeCard">
-      <!-- nav icons injected by JS to keep DRY -->
-    </div>
+    <!-- Floating info card (bars only — nav is global) -->
+    <div class="home-card" id="homeCard"></div>
   </div>
 </div>
 
@@ -497,25 +556,44 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a3408;font-family:
         <!-- Player LEFT -->
         <div class="player-side">
           <div class="player-sprite" id="playerSprite">
-            <svg width="90" height="115" viewBox="0 0 130 195" fill="none">
-              <ellipse cx="65" cy="189" rx="25" ry="5" fill="rgba(20,60,8,.4)"/>
-              <rect x="59" y="130" width="12" height="59" rx="6" fill="#3e2808"/>
-              <path d="M59 165 Q44 172 40 184" stroke="#3e2808" stroke-width="9" stroke-linecap="round" fill="none"/>
-              <path d="M71 168 Q84 175 88 185" stroke="#3e2808" stroke-width="9" stroke-linecap="round" fill="none"/>
-              <path d="M30 112 Q18 98 22 84" stroke="#3e2808" stroke-width="8" stroke-linecap="round" fill="none"/>
-              <path d="M100 112 Q112 98 108 84" stroke="#3e2808" stroke-width="8" stroke-linecap="round" fill="none"/>
-              <ellipse cx="65" cy="100" rx="46" ry="54" fill="#2a4c16"/>
-              <ellipse cx="65" cy="88" rx="37" ry="43" fill="#396420"/>
-              <ellipse cx="65" cy="77" rx="27" ry="31" fill="#4a7a2c"/>
-              <ellipse cx="65" cy="67" rx="19" ry="21" fill="#5a9234"/>
-              <path d="M65 45 C65 45 55 29 59 17 C62 8 68 13 65 25 C68 13 75 10 78 20 C81 31 65 45 65 45Z" fill="#74b83a"/>
-              <ellipse cx="52" cy="78" rx="11" ry="13" fill="#eaf6d4"/>
-              <ellipse cx="78" cy="78" rx="11" ry="13" fill="#eaf6d4"/>
-              <circle cx="53" cy="80" r="5" fill="#182406"/>
-              <circle cx="79" cy="80" r="5" fill="#182406"/>
-              <circle cx="54.5" cy="78.5" r="1.8" fill="white"/>
-              <circle cx="80.5" cy="78.5" r="1.8" fill="white"/>
-              <path d="M56 100 Q65 108 74 100" stroke="#325610" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <svg width="90" height="115" viewBox="0 0 160 200" fill="none">
+              <ellipse cx="80" cy="193" rx="30" ry="6" fill="rgba(20,60,5,.3)"/>
+              <path d="M108 155 Q134 140 138 118 Q142 98 126 90 Q118 86 114 94 Q110 104 118 110 Q126 116 122 126 Q116 138 104 144Z" fill="#3a7a1a"/>
+              <ellipse cx="60" cy="178" rx="13" ry="8" fill="#2e6a14" transform="rotate(-10 60 178)"/>
+              <ellipse cx="100" cy="180" rx="13" ry="8" fill="#2e6a14" transform="rotate(10 100 180)"/>
+              <ellipse cx="54" cy="185" rx="11" ry="5" fill="#3a8020" transform="rotate(-8 54 185)"/>
+              <ellipse cx="106" cy="186" rx="11" ry="5" fill="#3a8020" transform="rotate(8 106 186)"/>
+              <ellipse cx="80" cy="148" rx="44" ry="46" fill="#3a8020"/>
+              <ellipse cx="68" cy="128" rx="18" ry="14" fill="#4aaa28" opacity=".35"/>
+              <path d="M52 162 Q42 172 44 182" stroke="#2e6a14" stroke-width="13" stroke-linecap="round" fill="none"/>
+              <path d="M108 162 Q118 172 116 182" stroke="#2e6a14" stroke-width="13" stroke-linecap="round" fill="none"/>
+              <ellipse cx="44" cy="184" rx="10" ry="5" fill="#3a8020"/>
+              <ellipse cx="116" cy="184" rx="10" ry="5" fill="#3a8020"/>
+              <ellipse cx="80" cy="108" rx="24" ry="16" fill="#3a8020"/>
+              <ellipse cx="80" cy="82" rx="36" ry="34" fill="#3a8020"/>
+              <path d="M48 60 Q42 30 58 22 Q62 42 56 60Z" fill="#3a8020" stroke="#2a5a10" stroke-width="1.5"/>
+              <path d="M50 58 Q46 36 58 28 Q60 44 56 58Z" fill="#7acc40"/>
+              <path d="M112 60 Q118 30 102 22 Q98 42 104 60Z" fill="#3a8020" stroke="#2a5a10" stroke-width="1.5"/>
+              <path d="M110 58 Q114 36 102 28 Q100 44 104 58Z" fill="#7acc40"/>
+              <ellipse cx="80" cy="90" rx="20" ry="16" fill="#5aaa28"/>
+              <ellipse cx="65" cy="76" rx="11" ry="12" fill="#d8f8a0"/>
+              <ellipse cx="95" cy="76" rx="11" ry="12" fill="#d8f8a0"/>
+              <circle cx="65" cy="78" r="7.5" fill="#1a6008"/>
+              <circle cx="95" cy="78" r="7.5" fill="#1a6008"/>
+              <ellipse cx="65" cy="79" rx="4" ry="6" fill="#0a1e04"/>
+              <ellipse cx="95" cy="79" rx="4" ry="6" fill="#0a1e04"/>
+              <circle cx="68" cy="75" r="2.5" fill="white"/>
+              <circle cx="98" cy="75" r="2.5" fill="white"/>
+              <path d="M78 90 Q80 87 82 90 Q80 93 78 90Z" fill="#1a5008"/>
+              <path d="M75 93 Q80 98 85 93" stroke="#1a5008" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+              <path d="M80 93 L80 96" stroke="#1a5008" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="38" y1="88" x2="62" y2="92" stroke="#2a6010" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+              <line x1="38" y1="93" x2="62" y2="94" stroke="#2a6010" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+              <line x1="98" y1="92" x2="122" y2="88" stroke="#2a6010" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+              <line x1="98" y1="94" x2="122" y2="93" stroke="#2a6010" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+              <ellipse cx="50" cy="88" rx="8" ry="5" fill="rgba(80,200,40,.3)"/>
+              <ellipse cx="110" cy="88" rx="8" ry="5" fill="rgba(80,200,40,.3)"/>
+              <path d="M80 56 Q85 48 80 42 Q75 48 80 56Z" fill="#7acc40"/>
             </svg>
           </div>
         </div>
@@ -588,60 +666,41 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a3408;font-family:
   </div>
 </div>
 
-<!-- ══ NAV BAR ══ -->
-<nav class="nav-bar">
-
+<!-- ══ FLOATING NAV (outside all screens, overlays everything) ══ -->
+<nav id="floatNav">
   <button class="nb on" id="nb-home" onclick="navTo('home')">
     <div class="nb-ico">
-      <!-- Whimsical overgrown cabin -->
       <svg viewBox="0 0 34 34" fill="none">
-        <!-- Roof with curvy edges -->
         <path d="M4 19 Q8 10 17 6 Q26 10 30 19Z" fill="#5a8828" stroke="#3a6010" stroke-width="1"/>
-        <!-- Chimney with smoke curl -->
         <rect x="21" y="8" width="4" height="6" rx="1" fill="#7a5828" stroke="#5a3810" stroke-width=".8"/>
         <path d="M23 8 Q21 4 23 2 Q25 0 24 3" stroke="#c0b098" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".7"/>
-        <!-- Cabin body -->
         <rect x="7" y="19" width="20" height="11" rx="2" fill="#a07840" stroke="#7a5020" stroke-width="1"/>
-        <!-- Door (arched) -->
         <path d="M14 30 L14 24 Q17 22 20 24 L20 30Z" fill="#5a3010" stroke="#3a1808" stroke-width=".8"/>
-        <!-- Window with cross -->
         <rect x="8" y="21" width="5" height="5" rx=".5" fill="#b8e0f0" stroke="#7a5020" stroke-width=".8"/>
         <line x1="10.5" y1="21" x2="10.5" y2="26" stroke="#7a5020" stroke-width=".6"/>
         <line x1="8" y1="23.5" x2="13" y2="23.5" stroke="#7a5020" stroke-width=".6"/>
-        <!-- Vines on left wall -->
         <path d="M7 20 Q4 23 5 28 Q4 30 6 30" stroke="#4a8818" stroke-width="1.4" fill="none" stroke-linecap="round"/>
         <ellipse cx="4.5" cy="24" rx="2.2" ry="1.5" fill="#5aa020" opacity=".9"/>
         <ellipse cx="5.5" cy="29" rx="1.8" ry="1.2" fill="#6ab830" opacity=".85"/>
-        <!-- Vines on right wall -->
         <path d="M27 20 Q30 24 29 28 Q30 30 28 30" stroke="#4a8818" stroke-width="1.4" fill="none" stroke-linecap="round"/>
         <ellipse cx="29.5" cy="25" rx="2" ry="1.4" fill="#5aa020" opacity=".9"/>
-        <!-- Flower on roof peak -->
         <circle cx="17" cy="6.5" r="2.2" fill="#f080b0"/>
         <circle cx="17" cy="6.5" r="1" fill="#ffe060"/>
       </svg>
     </div>
     <div class="nb-lbl">Home</div>
   </button>
-
   <button class="nb" id="nb-explore" onclick="navTo('explore')">
     <div class="nb-ico">
-      <!-- Cute treasure map with rolled edges -->
       <svg viewBox="0 0 34 34" fill="none">
-        <!-- Map body (slightly rotated) -->
         <rect x="5" y="5" width="24" height="24" rx="3" fill="#e8d090" stroke="#b89040" stroke-width="1.2" transform="rotate(-4 17 17)"/>
-        <!-- Left scroll roll -->
         <ellipse cx="5" cy="17" rx="2" ry="8" fill="#d4b870" stroke="#b89040" stroke-width=".8" transform="rotate(-4 5 17)"/>
-        <!-- Right scroll roll -->
         <ellipse cx="29" cy="17" rx="2" ry="8" fill="#d4b870" stroke="#b89040" stroke-width=".8" transform="rotate(-4 29 17)"/>
-        <!-- Dotted path -->
         <path d="M10 22 Q13 18 17 20 Q21 22 24 17 Q25 14 22 12" stroke="#8a6020" stroke-width="1" fill="none" stroke-dasharray="1.5 2" stroke-linecap="round"/>
-        <!-- X marks spot -->
         <line x1="21" y1="11" x2="24" y2="14" stroke="#c03030" stroke-width="1.8" stroke-linecap="round"/>
         <line x1="24" y1="11" x2="21" y2="14" stroke="#c03030" stroke-width="1.8" stroke-linecap="round"/>
-        <!-- Trees doodle -->
         <path d="M9 20 L9 17" stroke="#5a8820" stroke-width="1" stroke-linecap="round"/>
         <ellipse cx="9" cy="16" rx="2.5" ry="2" fill="#5a8820"/>
-        <!-- Compass rose -->
         <circle cx="27" cy="24" r="3.5" stroke="#a07830" stroke-width=".8" fill="#f8e8b0"/>
         <line x1="27" y1="21.5" x2="27" y2="20.5" stroke="#c03030" stroke-width=".9" stroke-linecap="round"/>
         <line x1="27" y1="26.5" x2="27" y2="27.5" stroke="#a07830" stroke-width=".8" stroke-linecap="round"/>
@@ -651,26 +710,16 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a3408;font-family:
     </div>
     <div class="nb-lbl">Explore</div>
   </button>
-
   <button class="nb" id="nb-backpack" onclick="navTo('backpack')">
     <div class="nb-ico">
-      <!-- Cute round backpack with sunflower -->
       <svg viewBox="0 0 34 34" fill="none">
-        <!-- Bag body (rounder) -->
         <rect x="7" y="10" width="20" height="20" rx="6" fill="#c87838" stroke="#9a5820" stroke-width="1.2"/>
-        <!-- Top strap loop (cute) -->
         <path d="M12 10 Q12 5.5 17 5.5 Q22 5.5 22 10" stroke="#9a5820" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-        <!-- Front pocket (rounded) -->
         <rect x="10" y="19" width="14" height="9" rx="3" fill="#b86828" stroke="#9a5820" stroke-width="1"/>
-        <!-- Pocket zip dots -->
         <circle cx="13" cy="23.5" r=".9" fill="#7a3810"/>
         <circle cx="17" cy="23.5" r=".9" fill="#7a3810"/>
         <circle cx="21" cy="23.5" r=".9" fill="#7a3810"/>
-        <!-- Strap buckle -->
         <rect x="15" y="16" width="4" height="3" rx="1" fill="#8a5018" stroke="#6a3810" stroke-width=".7"/>
-        <!-- Sunflower pin on bag -->
-        <circle cx="22" cy="13.5" r="4" fill="none"/>
-        <!-- Petals -->
         <ellipse cx="22" cy="9.5" rx="1.2" ry="2" fill="#f0d030"/>
         <ellipse cx="22" cy="17.5" rx="1.2" ry="2" fill="#f0d030"/>
         <ellipse cx="18" cy="13.5" rx="2" ry="1.2" fill="#f0d030"/>
@@ -679,39 +728,28 @@ html,body{height:100%;width:100%;overflow:hidden;background:#1a3408;font-family:
         <ellipse cx="24.8" cy="10.7" rx="1.2" ry="2" fill="#e8c020" transform="rotate(-45 24.8 10.7)"/>
         <ellipse cx="19.2" cy="16.3" rx="1.2" ry="2" fill="#e8c020" transform="rotate(-45 19.2 16.3)"/>
         <ellipse cx="24.8" cy="16.3" rx="1.2" ry="2" fill="#e8c020" transform="rotate(45 24.8 16.3)"/>
-        <!-- Sunflower center -->
         <circle cx="22" cy="13.5" r="2.2" fill="#8a5010"/>
         <circle cx="22" cy="13.5" r="1.2" fill="#6a3808"/>
       </svg>
     </div>
     <div class="nb-lbl">Backpack</div>
   </button>
-
   <button class="nb" id="nb-settings" onclick="navTo('settings')">
     <div class="nb-ico">
-      <!-- Vine-covered cog, more organic -->
       <svg viewBox="0 0 34 34" fill="none">
-        <!-- Cog outer (slightly organic shape) -->
         <path d="M14 3.5 L14 2 L20 2 L20 3.5 Q23 4.5 25 6.5 L26.5 5.5 L30.5 12 L29 13 Q29.5 15 29.5 17 Q29.5 19 29 21 L30.5 22 L26.5 28.5 L25 27.5 Q23 29.5 20 30.5 L20 32 L14 32 L14 30.5 Q11 29.5 9 27.5 L7.5 28.5 L3.5 22 L5 21 Q4.5 19 4.5 17 Q4.5 15 5 13 L3.5 12 L7.5 5.5 L9 6.5 Q11 4.5 14 3.5Z" stroke="#6a9830" stroke-width="1.5" fill="#2a4a10" stroke-linejoin="round"/>
-        <!-- Cog center hole -->
         <circle cx="17" cy="17" r="5" stroke="#6a9830" stroke-width="1.3" fill="#1a3008"/>
-        <!-- Little leaf detail in center -->
         <path d="M17 14 Q19 17 17 20 Q15 17 17 14Z" fill="#5a8820" opacity=".7"/>
-        <!-- Vine wrapping left -->
         <path d="M3.5 12 Q1 14.5 1.5 17 Q1 19.5 3.5 22" stroke="#5a9018" stroke-width="1.5" fill="none" stroke-linecap="round"/>
         <ellipse cx="1" cy="17" rx="1.8" ry="1.2" fill="#6aaa20" opacity=".9"/>
-        <ellipse cx="1.8" cy="12.5" rx="1.5" ry="1" fill="#5a9818" opacity=".8"/>
-        <!-- Vine right -->
         <path d="M30.5 12 Q33 14.5 32.5 17 Q33 19.5 30.5 22" stroke="#5a9018" stroke-width="1.5" fill="none" stroke-linecap="round"/>
         <ellipse cx="33" cy="17" rx="1.8" ry="1.2" fill="#6aaa20" opacity=".9"/>
-        <!-- Tiny flower on top -->
         <circle cx="17" cy="1.5" r="2.2" fill="#f080b0"/>
         <circle cx="17" cy="1.5" r="1" fill="#ffe060"/>
       </svg>
     </div>
     <div class="nb-lbl">Settings</div>
   </button>
-
 </nav>
 </div>
 
@@ -820,7 +858,7 @@ function initHomeCard(){
 function navTo(id){
   if(id==='backpack'||id==='settings'){ toast('Coming soon...'); return; }
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
-  document.querySelectorAll('.nb, .hc-btn').forEach(function(b){ b.classList.remove('on'); });
+  document.querySelectorAll('.nb').forEach(function(b){ b.classList.remove('on'); });
   document.getElementById('screen-'+id).classList.add('active');
   // highlight both nav bar and home card button
   var nb = document.getElementById('nb-'+id);
@@ -1176,7 +1214,6 @@ function endBattle(){
 // ── INIT ──────────────────────────────────────────────────────────────────
 spawnMotes();
 updateWater();
-initHomeCard();
 </script>
 </body>
 </html>
